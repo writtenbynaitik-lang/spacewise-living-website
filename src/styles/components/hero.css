@@ -1,0 +1,273 @@
+/* =============================================================================
+   SpaceWise Living — HOMEPAGE HERO
+
+   An editorial two-part composition: a content column and a dominant media
+   area. It is NOT a centred SaaS hero and NOT a 100vh landing screen — the
+   height comes from the content and the media's aspect ratio, so the section
+   below always begins naturally within the page.
+
+   LAYOUT SWITCH: two columns from 70rem / 1120px, the same point the header
+   switches, so the whole top of the page changes in one coherent step rather
+   than at two different widths. Below that the hero stacks CONTENT FIRST, so a
+   phone visitor reaches the headline and both actions before any imagery.
+
+   The media area is STRUCTURE ONLY in this step. Step 5 fills it in; the shape,
+   focal-point hook, crop behaviour and fallback are already here.
+   ========================================================================== */
+
+@layer components {
+  .hero {
+    /* Slightly tighter at the top than a normal section: the hero sits directly
+       under the header and should not float away from it. */
+    padding-block-start: var(--space-xl);
+    padding-block-end: var(--space-section);
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: var(--grid-gap-row);
+  }
+
+  /* ---------------------------------------------------------------------------
+     CONTENT
+     Left-aligned at every width — including mobile. Centring the headline on
+     small screens would read as a generic app landing page and lose the
+     editorial identity.
+     ------------------------------------------------------------------------ */
+  .hero__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Keeps the measure comfortable while the hero is still stacked. */
+    max-width: var(--width-article);
+    /* The container is a grid, so this is a grid item and defaults to
+       `min-width: auto` — its min-content width, i.e. the longest unbreakable
+       word in the H1. At a 200% text size "actually" measures ~287px against a
+       240px track, which pushed the page 7px sideways at 320px (found in the
+       Step 13 audit). `0` lets the item take the track width; the global
+       `overflow-wrap: break-word` in reset.css then breaks the oversized word.
+       At normal text sizes the content already fits, so nothing changes. */
+    min-width: 0;
+  }
+
+  /* `align-items: flex-start` sizes each child to its own content rather than
+     stretching it, so a child whose content is wider than the column simply
+     overhangs it. The letter-spaced uppercase eyebrow did exactly that at a
+     200% text size. Capping the cross size lets the existing break-word wrap
+     it instead. No effect at normal sizes, where every child already fits. */
+  .hero__content > * {
+    max-width: 100%;
+  }
+
+  .hero__eyebrow {
+    margin-block-end: var(--flow-label);
+  }
+
+  .hero__heading {
+    font-family: var(--font-editorial);
+    font-size: var(--text-h1);
+    font-weight: var(--weight-editorial);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+    color: var(--color-ink);
+    /* Browser-balanced wrapping instead of hard-coded <br> tags, so the
+       headline reflows naturally at every width and never orphans a word. */
+    text-wrap: balance;
+  }
+
+  .hero__body {
+    margin-block-start: var(--space-md);
+    font-family: var(--font-interface);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+    /* Narrower than the content column so the paragraph never runs the full
+       width of the hero. */
+    max-width: var(--width-narrow);
+    text-wrap: pretty;
+  }
+
+  /* ---------------------------------------------------------------------------
+     ACTIONS
+     Side by side when there is room, stacked when there is not. `wrap` plus a
+     flex-basis floor does this without a media query, so the buttons can never
+     become cramped at an in-between width.
+     ------------------------------------------------------------------------ */
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-lg);
+    /* A definite width, not shrink-to-fit. The content column uses
+       `align-items: flex-start`, so this row would otherwise size to its
+       content — and the `100%` inside the buttons' `min-width` would then
+       resolve against an indefinite width, collapsing the row to ~313px and
+       wrapping the pair onto two lines even at 1440px. */
+    width: 100%;
+  }
+
+  .hero__actions > .button {
+    /* Grow to fill the row when stacked; never shrink below a tappable width.
+
+       The 11rem floor is applied in a media query rather than inline, because
+       `min-width: min(11rem, 100%)` does NOT hold at a 200% browser text size:
+       during intrinsic sizing a percentage resolves as `auto`, so the `100%`
+       cap disappears and the floor becomes 352px — wider than a 320px viewport,
+       which pushed the hero 7px off-screen (found in the Step 13 audit).
+
+       A media query cannot fail that way: `rem` inside one is resolved against
+       the INITIAL font size, so it tracks the viewport and ignores text zoom.
+       Below the breakpoint the buttons simply fill the row, which is what they
+       do on a phone anyway. */
+    flex: 1 1 auto;
+    max-width: 100%;
+    justify-content: center;
+  }
+
+  @media (min-width: 26rem) {
+    .hero__actions > .button {
+      min-width: 11rem;
+    }
+  }
+
+  @media (min-width: 30rem) {
+    .hero__actions > .button {
+      flex: 0 0 auto;
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     MEDIA
+     Structural only in Step 4.
+
+     Built to receive, in Step 5, without changing this layout:
+       - a static hero image                → <img> inside the frame
+       - desktop / mobile variants          → <source media> in the <picture>
+       - focal-point positioning            → --hero-focal-* below
+       - cropping                           → object-fit: cover + the ratio
+       - fallback                           → the placeholder state renders
+                                              whenever no image is supplied
+       - loading behaviour                  → fetchpriority / decoding on <img>
+
+     `.frame` (image.css) already supplies overflow, radius and a reserved box;
+     the hero only overrides the ratio, so there is no second image system.
+     ------------------------------------------------------------------------ */
+  .hero__media {
+    /* Instance values, not design tokens: a focal point belongs to a specific
+       photograph, so Step 5 sets these per image. */
+    --hero-focal-x: 50%;
+    --hero-focal-y: 50%;
+
+    --frame-ratio: var(--ratio-landscape);
+    /* Stops the stacked media becoming enormous on a wide phone or small
+       tablet, where a 3:2 box would otherwise be hundreds of pixels tall. The
+       ratio still governs on phones; above that the cap takes over and the
+       image simply crops. */
+    max-height: 22rem;
+    width: 100%;
+  }
+
+  /* `cover` crops to fill the reserved box without ever distorting the image;
+     the focal point decides WHICH part survives the crop. Matches both a bare
+     <img> and one inside <picture>. */
+  .hero__media :is(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--hero-focal-mobile-x, var(--hero-focal-x))
+      var(--hero-focal-mobile-y, var(--hero-focal-y));
+  }
+
+  /* ---------------------------------------------------------------------------
+     FAILURE FALLBACK
+
+     If the image 404s or fails to decode, the <img> is hidden and the frame's
+     warm neutral surface (--color-surface-alt, from the design tokens) is left
+     showing at the correct reserved size. No broken-image icon, no shifted
+     layout, no error styling — the hero keeps its heading, copy and both
+     actions, and the visitor can carry on into the site.
+
+     The visible loading / failure treatment is a later step. This is only the
+     underlying behaviour that stops a missing image damaging the hero.
+     ------------------------------------------------------------------------ */
+  .hero__media[data-media-failed='true'] :is(img, picture) {
+    display: none;
+  }
+
+  /* No image supplied: a quiet warm panel using the same neutral surface as
+     the failure fallback, so both states look identical and intentional.
+     `.frame` already supplies the radius and the reserved ratio. */
+  .hero__media--empty {
+    background-color: var(--color-surface-alt);
+  }
+
+  /* ---------------------------------------------------------------------------
+     TWO COLUMNS — from 64rem / 1024px
+
+     Measured: stacked at 1024px the hero ran 970px tall, taller than a typical
+     viewport, because the media spanned the full 917px container. Two columns
+     from here keep the composition balanced and the hero a sensible height.
+
+     The split is even at this tier rather than 44/56: 44% of the narrower
+     container leaves the content column under the 420px the brief asks for,
+     and the headline starts to feel cramped. The media becomes the larger
+     share from 70rem, where there is room for both.
+     ------------------------------------------------------------------------ */
+  @media (min-width: 64rem) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-xl);
+      align-items: center;
+    }
+
+    .hero__content {
+      max-width: none;
+    }
+
+    .hero__media {
+      --frame-ratio: var(--ratio-hero);
+      max-height: none;
+    }
+
+    /* From here the frame is the 5:4 desktop crop, so drop the mobile focal
+       override and fall back to the desktop focal point. */
+    .hero__media :is(img) {
+      object-position: var(--hero-focal-x) var(--hero-focal-y);
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     WIDE DESKTOP — from 70rem / 1120px
+     With more room the media takes a larger share and becomes clearly dominant,
+     while the content column still holds a three-line headline.
+     ------------------------------------------------------------------------ */
+  @media (min-width: 70rem) {
+    .hero {
+      padding-block-start: var(--space-2xl);
+    }
+
+    .hero__inner {
+      grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+      gap: var(--space-2xl);
+      /* Centred against the media rather than top-aligned: with a taller media
+         box, top-alignment leaves the text stranded at the top. */
+      align-items: center;
+    }
+  }
+
+  /* Short desktop viewports — laptops at 1280×720 and below, or a split screen.
+     Caps the media so the hero never fills the whole screen on its own and the
+     next section always peeks above the fold. */
+  @media (min-width: 64rem) and (max-height: 46rem) {
+    .hero {
+      padding-block: var(--space-xl);
+    }
+
+    .hero__media {
+      /* Measured on a 1280x620 laptop: at 68svh the hero plus the header filled
+         the screen exactly, so nothing below it was visible and the page looked
+         like it ended. 60svh leaves the next section just showing. */
+      max-height: 60svh;
+    }
+  }
+}

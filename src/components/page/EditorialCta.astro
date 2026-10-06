@@ -1,0 +1,45 @@
+---
+/**
+ * EditorialCta — the closing block on a destination page.
+ *
+ * One heading, one line, one link to a route that exists. No email capture, no
+ * newsletter provider, no "join N readers" — no newsletter has been set up and
+ * no reader numbers exist, so there is nothing to claim.
+ *
+ * It sits on the sage accent surface, matching the homepage contact prompt, so
+ * the end of a category page feels like the end of a page on the same site.
+ */
+import Button from '../ui/Button.astro';
+import Container from '../ui/Container.astro';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  body?: string;
+  href?: string;
+  actionLabel?: string;
+}
+
+const {
+  eyebrow = 'Keep going',
+  heading = 'Make more room for the life you actually live.',
+  body = 'Explore more practical organization ideas for making small spaces feel calmer, smarter, and easier to live in.',
+  href = '/articles/',
+  actionLabel = 'Explore all ideas',
+} = Astro.props;
+---
+
+<Section tone="accent" aria-labelledby="editorial-cta-heading">
+  <Container width="content">
+    <div class="editorial-cta">
+      <Eyebrow class="editorial-cta__eyebrow">{eyebrow}</Eyebrow>
+      <h2 class="t-h2 editorial-cta__heading" id="editorial-cta-heading">{heading}</h2>
+      <p class="editorial-cta__body">{body}</p>
+      <div class="editorial-cta__action">
+        <Button href={href} variant="primary">{actionLabel}</Button>
+      </div>
+    </div>
+  </Container>
+</Section>

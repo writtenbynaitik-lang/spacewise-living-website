@@ -1,0 +1,247 @@
+/* =============================================================================
+   SpaceWise Living — ARTICLE-SPECIFIC VISUAL LANGUAGE
+
+   The article page is the single most important template on this site: it is
+   where Pinterest traffic lands. The PAGE is not built yet — that is a later
+   step. What lives here is the reusable visual language that step will use, so
+   the article experience is assembled from an established system rather than
+   designed from scratch under pressure.
+
+   Base prose typography lives in typography.css (.prose). This file covers the
+   article furniture around it.
+   ========================================================================== */
+
+@layer components {
+  /* ---------------------------------------------------------------------------
+     ARTICLE HEADER
+     A Pinterest visitor must confirm within one screen that this page is what
+     the Pin promised. The order is therefore fixed:
+       category → title → deck → metadata
+     ------------------------------------------------------------------------ */
+  .article-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    max-width: var(--width-article);
+  }
+
+  .article-header__category {
+    /* .eyebrow + .eyebrow--accent supply the type; this adds link behaviour. */
+    text-decoration: none;
+    align-self: flex-start;
+  }
+
+  .article-header__category:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .article-header__title {
+    font-family: var(--font-editorial);
+    font-size: var(--text-h1);
+    font-weight: var(--weight-editorial);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  /* Deck / subtitle — restates the promise in plain language. */
+  .article-header__deck {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+    text-wrap: pretty;
+  }
+
+  /* Author / date / reading time. Uses the shared .meta row. */
+  .article-header__meta {
+    padding-block-start: var(--space-2xs);
+  }
+
+  /* Reading time gets a slightly firmer treatment — it is the one piece of
+     metadata that changes whether someone starts reading. */
+  .reading-time {
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-secondary);
+  }
+
+  /* ---------------------------------------------------------------------------
+     NUMBERED IDEA
+     The backbone of "21 small kitchen storage ideas" style articles. The number
+     is a visible editorial device, set in the serif, sitting beside the
+     heading rather than inside the text flow.
+     ------------------------------------------------------------------------ */
+  .idea {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-2xs) var(--space-sm);
+    align-items: baseline;
+    margin-block-start: var(--space-xl);
+  }
+
+  .idea__number {
+    font-family: var(--font-editorial);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-editorial);
+    line-height: 1;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .idea__title {
+    font-family: var(--font-editorial);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-editorial);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-heading);
+    color: var(--color-ink);
+  }
+
+  /* Body copy aligns under the title, not under the number. */
+  .idea__body {
+    grid-column: 2;
+  }
+
+  .idea__body > * + * {
+    margin-block-start: var(--flow-text);
+  }
+
+  /* ---------------------------------------------------------------------------
+     TIP / CALLOUT
+     A quiet aside. Tinted surface, no icon, no shadow — it should feel like a
+     margin note in a well-made magazine, not an alert box.
+     ------------------------------------------------------------------------ */
+  .callout {
+    padding: var(--space-md);
+    background-color: var(--color-accent-soft);
+    border-radius: var(--radius-md);
+    /* Leading-edge rule rather than a full outline. */
+    border-inline-start: 2px solid var(--color-accent);
+  }
+
+  .callout__label {
+    display: block;
+    margin-block-end: var(--space-3xs);
+    font-family: var(--font-interface);
+    font-size: var(--text-eyebrow);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .callout__body {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body);
+    color: var(--color-ink);
+  }
+
+  .callout--neutral {
+    background-color: var(--color-surface-alt);
+    border-inline-start-color: var(--color-border-interactive);
+  }
+
+  .callout--neutral .callout__label { color: var(--color-text-secondary); }
+
+  /* ---------------------------------------------------------------------------
+     FAQ
+     Native <details>/<summary>: keyboard accessible and works without JS.
+     ------------------------------------------------------------------------ */
+  .faq {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .faq__item {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .faq__question {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding-block: var(--space-sm);
+    min-height: var(--tap-target-min);
+    font-family: var(--font-interface);
+    font-size: var(--text-body);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    color: var(--color-ink);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .faq__question::-webkit-details-marker { display: none; }
+
+  .faq__question:hover { color: var(--color-accent); }
+
+  /* Open/closed is shown by a rotating marker AND by the answer appearing —
+     never by colour alone. */
+  .faq__question::after {
+    content: '';
+    flex: none;
+    width: 0.6em;
+    height: 0.6em;
+    margin-block-start: 0.35em;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform var(--duration-base) var(--ease-standard);
+  }
+
+  .faq__item[open] .faq__question::after {
+    transform: rotate(-135deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq__question::after { transition: none; }
+  }
+
+  .faq__answer {
+    padding-block-end: var(--space-md);
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+    max-width: var(--width-article);
+  }
+
+  /* ---------------------------------------------------------------------------
+     RELATED ARTICLES
+     ------------------------------------------------------------------------ */
+  .related {
+    padding-block-start: var(--space-xl);
+    border-top: 1px solid var(--color-border-strong);
+  }
+
+  .related__title {
+    font-family: var(--font-interface);
+    font-size: var(--text-eyebrow);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-block-end: var(--space-md);
+  }
+
+  /* ---------------------------------------------------------------------------
+     ARTICLE IMAGE
+     Article images may step outside the reading column for emphasis. The
+     reading text stays at --width-article; imagery can breathe wider.
+     ------------------------------------------------------------------------ */
+  .article-figure {
+    margin-block: var(--space-xl);
+  }
+
+  @media (min-width: 64rem) {
+    .article-figure--wide {
+      width: var(--width-wide);
+      max-width: calc(100vw - (var(--gutter) * 2));
+      /* Centre the wider figure on the narrower reading column. */
+      margin-inline: calc((var(--width-article) - min(var(--width-wide), 100vw - (var(--gutter) * 2))) / 2);
+    }
+  }
+}

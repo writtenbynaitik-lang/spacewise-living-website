@@ -1,0 +1,264 @@
+/* =============================================================================
+   SpaceWise Living — DESIGN TOKENS
+   The single source of truth for every value in the design system.
+
+   Rule: no component file may contain a raw colour, size, radius, duration or
+   spacing value. If a value is needed, it is added here first. This is what
+   keeps "magic numbers" out of the stylesheet as the site grows.
+
+   Documented in design-system.md. Changing a value here changes it everywhere.
+   ========================================================================== */
+
+/* Cascade layer order. Declared once, before any layer is used, so later files
+   can never accidentally out-specify earlier ones. Anything written OUTSIDE a
+   layer beats all of these, which makes one-off overrides predictable. */
+@layer tokens, reset, base, layout, components, utilities;
+
+@layer tokens {
+  :root {
+    color-scheme: light;
+
+    /* =========================================================================
+       1. COLOUR
+       Warm, natural, calm, slightly earthy. Every value below was chosen by
+       computing WCAG contrast ratios, not by eye — see design-system.md §3 for
+       the full measured matrix.
+       ====================================================================== */
+
+    /* -- Backgrounds -------------------------------------------------------- */
+    --color-page: #fbf9f5;         /* Warm ivory — the default page background */
+    --color-surface: #fffdf9;      /* Warm white — cards and raised surfaces   */
+    --color-surface-alt: #f3ede2;  /* Light warm beige — alternate sections    */
+    --color-accent-soft: #eaefe4;  /* Pale sage tint — accent surfaces only    */
+
+    /* -- Text ---------------------------------------------------------------
+       Three deliberately distinct steps. Measured on the page background:
+       ink 15.60:1, ink-secondary 6.90:1, ink-muted 5.15:1. All three clear
+       4.5:1 on every background above, including the darkest (surface-alt). */
+    --color-ink: #221f1b;           /* Deep charcoal, warm-tinted, not black   */
+    --color-ink-secondary: #5c564e; /* Warm gray — decks, excerpts, secondary  */
+    --color-ink-muted: #706960;     /* Warm gray — metadata, captions          */
+    --color-on-accent: #fffdf9;     /* Text on accent fills — 5.86:1 on accent */
+
+    /* -- Accent -------------------------------------------------------------
+       Muted sage. Used sparingly and with one clear job: the action colour,
+       plus small editorial cues. Never a large colour field. */
+    --color-accent: #56694e;        /* 5.66:1 on page — safe as text AND fill  */
+    --color-accent-hover: #46573f;  /* Darker, for hover/active                */
+    --color-accent-border: #b9c6b0; /* Decorative sage rules only              */
+
+    /* -- Borders ------------------------------------------------------------
+       Split by PURPOSE, not by shade. Decorative hairlines stay soft so the
+       design is not harsh; anything outlining an interactive control uses
+       --color-border-interactive, which meets the 3:1 non-text minimum. */
+    --color-border: #e4ded3;             /* Soft warm gray — dividers, cards  */
+    --color-border-strong: #d3cabb;      /* Firmer grouping separation        */
+    --color-border-interactive: #8f8a7d; /* 3.27:1 on page — control outlines */
+
+    /* -- Focus --------------------------------------------------------------
+       Deep charcoal, drawn with an offset so the ring always sits on the page
+       background rather than on the control: 14:1+ against every surface. */
+    --color-focus: #221f1b;
+
+    /* -- Semantic aliases ---------------------------------------------------
+       Components reference these, not the raw colours above, so the palette
+       can be retuned without touching component CSS. */
+    --color-text: var(--color-ink);
+    --color-text-secondary: var(--color-ink-secondary);
+    --color-text-muted: var(--color-ink-muted);
+    --color-link: var(--color-ink);
+    --color-link-hover: var(--color-accent);
+
+    /* Warm shadow base (RGB channels). Never pure black — a black shadow on a
+       warm ivory page reads gray and cold. */
+    --shadow-rgb: 46 40 32;
+
+    /* =========================================================================
+       2. TYPOGRAPHY
+       Editorial serif + clean modern sans. See design-system.md §4.
+       ====================================================================== */
+
+    /* Fraunces — editorial serif. Carries the brand voice: warm, high-quality
+       independent publication. Variable `opsz` axis means headlines
+       automatically get the refined display cut and small sizes stay readable.
+       Fallbacks are warm old-style serifs so a font failure degrades in
+       character rather than snapping to Times. */
+    --font-editorial: 'Fraunces Variable', 'Iowan Old Style', 'Palatino Linotype',
+      Palatino, 'Book Antiqua', Georgia, serif;
+
+    /* Figtree — interface sans. Humanist, warm, tall x-height, highly legible
+       at metadata sizes. Chosen over Inter specifically to avoid the generic
+       product-UI look the brief rules out. */
+    --font-interface: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI',
+      Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+    /* Restrained weight set — three per family, all from one variable file. */
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-editorial: 500; /* Default for Fraunces headlines */
+
+    /* -- Type scale ---------------------------------------------------------
+       Fluid via clamp(), tuned so headlines never dominate a 320px viewport:
+       display is 36px at 320px and 68px at 1280px. Minimums are expressed in
+       rem so the scale still responds to the browser's base font size. */
+    --text-display: clamp(2.25rem, 1.6rem + 3.25vw, 4.25rem); /* 36 → 68 */
+    --text-h1: clamp(2rem, 1.5rem + 2.5vw, 3.25rem);          /* 32 → 52 */
+    --text-h2: clamp(1.5rem, 1.25rem + 1.25vw, 2.25rem);      /* 24 → 36 */
+    --text-h3: clamp(1.25rem, 1.125rem + 0.625vw, 1.625rem);  /* 20 → 26 */
+    --text-h4: clamp(1.0625rem, 1rem + 0.3125vw, 1.25rem);    /* 17 → 20 */
+    --text-body-lg: clamp(1.0625rem, 1rem + 0.3125vw, 1.1875rem); /* 17 → 19 */
+    --text-body: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);     /* 16 → 17 */
+    --text-body-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9375rem); /* 14 → 15 */
+    --text-meta: 0.875rem;    /* 14px — floor for readable metadata */
+    --text-eyebrow: 0.8125rem;/* 13px — uppercase needs more than 12px */
+    --text-button: 0.9375rem; /* 15px */
+
+    /* -- Line height --------------------------------------------------------
+       Body sits at 1.7, inside the 1.6–1.8 target. */
+    --leading-display: 1.06;
+    --leading-tight: 1.15;
+    --leading-heading: 1.25;
+    --leading-snug: 1.4;
+    --leading-body: 1.7;
+    --leading-relaxed: 1.75; /* Long-form article body */
+
+    /* -- Letter spacing -----------------------------------------------------
+       Large serif type needs slight negative tracking; uppercase eyebrows need
+       positive tracking to stay legible. */
+    --tracking-display: -0.02em;
+    --tracking-heading: -0.012em;
+    --tracking-normal: 0;
+    --tracking-eyebrow: 0.08em;
+
+    /* =========================================================================
+       3. CONTENT WIDTHS
+       Deliberately NOT one width for everything. The article column is much
+       narrower than the homepage grid so reading feels different from browsing.
+       ====================================================================== */
+    --width-max: 80rem;       /* 1280px — absolute outer bound                */
+    --width-wide: 75rem;      /* 1200px — wide editorial features             */
+    --width-content: 72.5rem; /* 1160px — standard content grid               */
+    --width-article: 45rem;   /* 720px  — article reading column              */
+    --width-narrow: 36rem;    /* 576px  — pull quotes, CTA copy, form blocks  */
+
+    /* =========================================================================
+       4. PAGE GUTTERS
+       One fluid token instead of per-breakpoint margins: 20px at 320px,
+       ~37px at 768px, ~56px at 1280px, capped at 64px.
+       ====================================================================== */
+    --gutter: clamp(1.25rem, 0.5rem + 3.75vw, 4rem);
+
+    /* =========================================================================
+       5. SPACING
+       A small fixed scale plus a few semantic tokens for recurring
+       relationships. Components use the semantic names where one exists.
+       ====================================================================== */
+    --space-3xs: 0.25rem; /*  4px */
+    --space-2xs: 0.5rem;  /*  8px */
+    --space-xs: 0.75rem;  /* 12px */
+    --space-sm: 1rem;     /* 16px */
+    --space-md: 1.5rem;   /* 24px */
+    --space-lg: 2rem;     /* 32px */
+    --space-xl: 3rem;     /* 48px */
+    --space-2xl: 4rem;    /* 64px */
+    --space-3xl: 6rem;    /* 96px */
+
+    /* Semantic relationships */
+    --flow-label: var(--space-2xs);  /* eyebrow → heading   */
+    --flow-heading: var(--space-xs); /* heading → paragraph */
+    --flow-text: var(--space-md);    /* paragraph → next    */
+    --flow-group: var(--space-lg);   /* group → group       */
+
+    --space-card: clamp(1.25rem, 1rem + 1vw, 1.75rem); /* card interior */
+
+    /* Section rhythm. --space-section-lg marks major editorial transitions.
+       Capped so a gap never reads as "the page has ended". */
+    --space-section: clamp(3rem, 2rem + 5vw, 6.5rem);     /* 48 → 104 */
+    --space-section-lg: clamp(4rem, 2.5rem + 7.5vw, 9rem);/* 64 → 144 */
+
+    /* Grid gaps — row gaps are larger than column gaps so stacked cards on
+       mobile keep a clear rhythm. */
+    --grid-gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    --grid-gap-row: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+
+    /* =========================================================================
+       6. RADII — restrained. Modern and tactile, never bubbly.
+       Buttons are slightly rounder than editorial cards, by design.
+       ====================================================================== */
+    --radius-xs: 3px;
+    --radius-sm: 6px;
+    --radius-md: 8px;  /* cards, images — the default */
+    --radius-lg: 12px; /* large blocks, CTA panels    */
+    --radius-button: 10px;
+    --radius-pill: 999px; /* tags/chips ONLY — used sparingly */
+
+    /* =========================================================================
+       7. SHADOWS — used extremely sparingly. Hierarchy comes from spacing,
+       scale, typography and imagery first. Warm-tinted and low elevation.
+       ====================================================================== */
+    --shadow-none: none;
+    --shadow-subtle: 0 1px 2px rgb(var(--shadow-rgb) / 0.04),
+      0 2px 6px rgb(var(--shadow-rgb) / 0.04);
+    --shadow-raised: 0 1px 2px rgb(var(--shadow-rgb) / 0.05),
+      0 10px 24px -8px rgb(var(--shadow-rgb) / 0.1);
+
+    /* =========================================================================
+       8. MOTION — subtle, purposeful, fast enough to feel responsive.
+       Every use must degrade under prefers-reduced-motion (see reset.css).
+       ====================================================================== */
+    --duration-fast: 120ms;
+    --duration-base: 200ms;
+    --duration-slow: 320ms;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* =========================================================================
+       9. IMAGE ASPECT RATIOS
+       Content type determines the crop — images are never all forced into one
+       shape. Containers reserve space so there is no layout shift.
+       ====================================================================== */
+    --ratio-landscape: 3 / 2;  /* standard editorial                 */
+    --ratio-editorial: 16 / 10;/* wide feature                       */
+    --ratio-portrait: 4 / 5;   /* portrait article / card imagery    */
+    --ratio-pin: 2 / 3;        /* Pinterest Pin images               */
+    --ratio-square: 1 / 1;     /* thumbnails, product recommendations*/
+    --ratio-hero: 5 / 4;       /* hero media, two-column desktop layout */
+    --ratio-band: 2 / 1;       /* wide page-hero band, desktop only    */
+
+    /* =========================================================================
+       10. HEADER
+       The sticky header is compact by design: it must stay available without
+       taking editorial space. Height is a token because `scroll-padding` and
+       the mobile menu's max-height both derive from it.
+       ====================================================================== */
+    --header-height: 3.75rem; /* 60px — mobile */
+    --header-height-lg: 4.25rem; /* 68px — from the desktop nav breakpoint */
+
+    /* =========================================================================
+       11. FOCUS + CONTROLS
+       ====================================================================== */
+    --focus-width: 2px;
+    --focus-offset: 2px;
+    --tap-target-min: 44px; /* minimum comfortable touch target */
+
+    /* =========================================================================
+       12. BREAKPOINTS (reference only)
+       Custom properties cannot be used inside @media, so media queries use the
+       literal equivalents. These tokens exist so the values are documented in
+       one place and stay consistent. Chosen from content behaviour:
+         sm  480px — compact lists gain a second column
+         md  768px — card grids go two-up; article gains comfortable margins
+         lg 1024px — card grids go three-up
+         nav 1120px — the header switches between mobile and desktop layouts
+                      (see --bp-nav; measured, not guessed — the desktop header
+                      needs ~1000px of content width before it feels cramped)
+         xl 1280px — content reaches --width-content and gutters stop growing
+       ====================================================================== */
+    --bp-sm: 30rem;
+    --bp-md: 48rem;
+    --bp-lg: 64rem;
+    --bp-nav: 70rem; /* 1120px */
+    --bp-xl: 80rem;
+  }
+}

@@ -1,0 +1,39 @@
+---
+/**
+ * MetadataRow - category, date and reading time.
+ *
+ * Separators are generated in CSS, so a missing field never leaves a dangling
+ * dot. Anything not supplied is simply omitted - nothing is invented to fill
+ * the row out.
+ */
+interface Props {
+  category?: { name: string; href?: string };
+  /** ISO date string. Rendered in a <time> element. */
+  date?: string;
+  /** Human-readable date label. Falls back to the ISO date. */
+  dateLabel?: string;
+  readingTimeMinutes?: number;
+  author?: string;
+  class?: string;
+}
+
+const { category, date, dateLabel, readingTimeMinutes, author, class: className } = Astro.props;
+---
+
+<div class:list={['meta', className]}>
+  {
+    category &&
+      (category.href ? (
+        <a href={category.href}>{category.name}</a>
+      ) : (
+        <span>{category.name}</span>
+      ))
+  }
+  {author && <span>{author}</span>}
+  {date && <time datetime={date}>{dateLabel ?? date}</time>}
+  {
+    readingTimeMinutes && (
+      <span class="reading-time">{readingTimeMinutes} min read</span>
+    )
+  }
+</div>

@@ -1,0 +1,734 @@
+/* =============================================================================
+   SpaceWise Living — DESTINATION PAGE SECTIONS
+
+   The shared furniture for category pages and the article index: page hero,
+   section headings, topic lists, article grids, empty states, reserved content
+   placeholders, related rooms and the closing CTA.
+
+   Every value here is a token. No raw colour, size, radius or duration appears
+   in this file — if something needed a new value, it was added to tokens.css
+   first. Nothing in this file touches the homepage: the homepage composes
+   Hero / IntroSection / ExploreSection / ApproachSection / ContactSection,
+   none of which use these classes.
+   ========================================================================== */
+
+@layer components {
+  /* ---------------------------------------------------------------------------
+     PAGE HERO
+     A quiet stack, not a second homepage hero. The title carries the page; the
+     photograph underneath is supporting, which is why it is wide and short
+     rather than tall and dominant.
+     ------------------------------------------------------------------------ */
+  .page-hero {
+    max-width: var(--width-article);
+  }
+
+  .page-hero__eyebrow {
+    margin-block-end: var(--flow-label);
+  }
+
+  .page-hero__title {
+    margin-block-end: var(--flow-heading);
+  }
+
+  .page-hero__deck {
+    color: var(--color-text-secondary);
+  }
+
+  /* The hero photograph, as a band.
+     NOT `--ratio-hero` (5/4): that token is the TALL crop the homepage uses
+     beside its two-column copy; at full content width it renders ~900px high
+     and pushes every section below the fold.
+
+     The ratio is RESPONSIVE because the source photographs are natively 3:2 and
+     carry storage detail from top to bottom — the thing Step 7 showed is easy
+     to crop away. On a phone the column is narrow, so 16/10 is already short
+     enough and the gentler crop is kept. Only once the column is wide enough
+     for 16/10 to measure ~700px tall does it widen to the 2/1 band. */
+  .page-hero__media {
+    margin-block-start: var(--space-xl);
+    aspect-ratio: var(--ratio-editorial);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  @media (min-width: 64rem) {
+    .page-hero__media {
+      aspect-ratio: var(--ratio-band);
+    }
+  }
+
+  .page-hero__media :is(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ---------------------------------------------------------------------------
+     SECTION HEADING
+     One heading treatment shared by every section below the hero, so the page
+     reads as a sequence rather than a stack of unrelated modules.
+     ------------------------------------------------------------------------ */
+  .section-head {
+    max-width: var(--width-article);
+    margin-block-end: var(--space-xl);
+  }
+
+  .section-head__eyebrow {
+    margin-block-end: var(--flow-label);
+  }
+
+  .section-head__heading {
+    margin-block-end: var(--flow-heading);
+  }
+
+  .section-head__intro {
+    font-family: var(--font-interface);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+  }
+
+  /* `.section-head__heading` is the last element when there is no intro. */
+  .section-head__heading:last-child {
+    margin-block-end: 0;
+  }
+
+  /* ---------------------------------------------------------------------------
+     RESERVED CONTENT PLACEHOLDER
+
+     Used where a real article or a verified product recommendation will go.
+     Styled to read as a reserved slot and NOT as a card: no shadow, no hover,
+     nothing clickable. A dashed border is the one place this design system uses
+     one — it is the conventional "nothing here yet" signal, and it stops the
+     block from being mistaken for finished content.
+     ------------------------------------------------------------------------ */
+  .placeholder {
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+    padding: var(--space-lg);
+  }
+
+  .placeholder__label {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-block-end: var(--flow-label);
+  }
+
+  .placeholder__note {
+    font-family: var(--font-interface);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+    max-width: var(--width-narrow);
+  }
+
+  .placeholder__note + .placeholder__note {
+    margin-block-start: var(--flow-text);
+  }
+
+  /* The featured slot reserves the same shape a featured ArticleCard occupies,
+     so publishing the first article changes the content, not the layout. */
+  .placeholder--featured {
+    display: grid;
+    gap: var(--space-lg);
+    align-items: center;
+  }
+
+  /* Grid items default to `min-width: auto`, i.e. their min-content width — the
+     longest unbreakable word. `overflow-wrap: break-word` does NOT reduce that
+     (only `anywhere` does), so at a 200% text size the label "placeholder" held
+     these items at 223px inside a 112px box and pushed the page 8px sideways
+     (found in the Step 13 audit). `min-width: 0` lets them take the track width;
+     the existing break-word then wraps the long words. */
+  .placeholder--featured > * {
+    min-width: 0;
+  }
+
+  .placeholder__frame {
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface-alt);
+  }
+
+  @media (min-width: 48rem) {
+    .placeholder--featured {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 4fr);
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     TOPICS
+     Problem areas. Plain text today because no topic route exists; the link
+     treatment is already here for when one does.
+     ------------------------------------------------------------------------ */
+  .topics {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 48rem) {
+    .topics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--grid-gap);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .topics {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .topics__item {
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .topic {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-height: var(--tap-target-min);
+    padding-block: var(--space-sm);
+    font-family: var(--font-interface);
+    font-size: var(--text-body);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    color: var(--color-text);
+  }
+
+  /* The sage marker is decorative; the label carries the meaning. */
+  .topic::before {
+    content: '';
+    flex: none;
+    width: var(--space-xs);
+    height: 1px;
+    background-color: var(--color-accent-border);
+  }
+
+  .topic--link {
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-standard);
+  }
+
+  .topic--link:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+  }
+
+  /* ---------------------------------------------------------------------------
+     ARTICLE GRID
+     ------------------------------------------------------------------------ */
+  .article-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--grid-gap-row) var(--grid-gap);
+  }
+
+  @media (min-width: 48rem) {
+    .article-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .article-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .article-grid__action {
+    margin-block-start: var(--space-xl);
+  }
+
+  /* ---------------------------------------------------------------------------
+     EMPTY STATE
+     The normal condition until the first article is published, so it is built
+     to look deliberate: a calm panel with one sentence. No illustration, no
+     "coming soon", no signup.
+     ------------------------------------------------------------------------ */
+  .empty-state {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+    padding: var(--space-xl) var(--space-lg);
+    text-align: center;
+  }
+
+  .empty-state__message {
+    max-width: var(--width-narrow);
+    margin-inline: auto;
+    font-family: var(--font-interface);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+  }
+
+  /* ---------------------------------------------------------------------------
+     STORAGE SOLUTIONS
+     ------------------------------------------------------------------------ */
+  .solutions {
+    display: grid;
+    gap: var(--grid-gap-row);
+  }
+
+  /* Affiliate disclosure under in-article recommendations. Required whenever an
+     affiliate link is present, so it is part of the module, not a page option. */
+  .article-disclosure {
+    margin-block-start: var(--space-lg);
+    color: var(--color-text-muted);
+  }
+
+  /* ---------------------------------------------------------------------------
+     RELATED ROOMS
+     Reuses .explore-card from explore.css — only the grid differs, because
+     three rooms are shown here rather than eight.
+     ------------------------------------------------------------------------ */
+  .related-rooms {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--grid-gap-row) var(--grid-gap);
+  }
+
+  @media (min-width: 48rem) {
+    .related-rooms {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .related-rooms {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     EDITORIAL CTA
+     Centred, matching the homepage contact prompt so the foot of a category
+     page belongs to the same site.
+     ------------------------------------------------------------------------ */
+  .editorial-cta {
+    max-width: var(--width-article);
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .editorial-cta__eyebrow {
+    margin-block-end: var(--flow-label);
+  }
+
+  .editorial-cta__heading {
+    margin-block-end: var(--flow-heading);
+  }
+
+  .editorial-cta__body {
+    max-width: var(--width-narrow);
+    margin-inline: auto;
+    font-family: var(--font-interface);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+  }
+
+  .editorial-cta__action {
+    margin-block-start: var(--space-lg);
+  }
+}
+
+/* =============================================================================
+   SEARCH (/search/)
+
+   Editorial, not a search appliance: the same heading stack as any other
+   destination page, one field, one button. No oversized hero input, no filter
+   sidebar, no result-count chrome.
+   ========================================================================== */
+
+@layer components {
+  .search__head {
+    max-width: var(--width-article);
+    margin-block-end: var(--space-xl);
+  }
+
+  .search__eyebrow {
+    margin-block-end: var(--flow-label);
+  }
+
+  .search__title {
+    margin-block-end: var(--flow-heading);
+  }
+
+  .search__deck {
+    color: var(--color-text-secondary);
+  }
+
+  .search__form {
+    max-width: var(--width-article);
+  }
+
+  /* A real visible label. The placeholder is a hint, never the accessible name. */
+  .search__label {
+    display: block;
+    margin-block-end: var(--flow-label);
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+  }
+
+  /* Wraps rather than squeezing the field at 320px. */
+  .search__field {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  /* Matches the established input treatment in cta.css — same surface, border,
+     radius and type — so search does not introduce a second field style. */
+  .search__input {
+    flex: 1 1 14rem;
+    min-width: 0;
+    min-height: var(--tap-target-min);
+    padding: var(--space-2xs) var(--space-sm);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-interactive);
+    border-radius: var(--radius-button);
+    font-family: var(--font-interface);
+    font-size: var(--text-body);
+    color: var(--color-ink);
+  }
+
+  .search__input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  /* Safari paints its own clear affordance on type="search"; leave it alone
+     rather than restyling a control the platform already handles. */
+
+  .search__status {
+    margin-block-start: var(--space-md);
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .search__status[hidden],
+  .search__results[hidden],
+  .search__result[hidden],
+  .search__state[hidden],
+  .search__reset[hidden],
+  .search__hint[hidden] {
+    display: none;
+  }
+
+  /* --- No-query hint ------------------------------------------------------
+     Plain text, deliberately NOT links and NOT cards: an example topic must
+     never read as a result that exists. */
+  .search__hint {
+    margin-block-start: var(--space-xl);
+    max-width: var(--width-article);
+  }
+
+  .search__hint-lead {
+    font-family: var(--font-editorial);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-editorial);
+    line-height: var(--leading-snug);
+    color: var(--color-ink);
+    margin-block-end: var(--flow-heading);
+  }
+
+  .search__hint-body {
+    font-family: var(--font-interface);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+  }
+
+  .search__examples {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-xs);
+    margin-block-start: var(--space-md);
+  }
+
+  .search__examples li {
+    padding: var(--space-3xs) var(--space-xs);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface-alt);
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .search__state,
+  .search__results {
+    margin-block-start: var(--space-xl);
+  }
+
+  .search__noscript {
+    margin-block-start: var(--space-md);
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .search__reset {
+    margin-block-start: var(--space-lg);
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+  }
+}
+
+/* =============================================================================
+   ABOUT (/about/) and CONTACT (/contact/)
+
+   Two reading pages. Everything here is either an existing pattern (section
+   heads, placeholders, the editorial CTA) or a plain text list — no new card
+   type, no new colour, no new motion.
+   ========================================================================== */
+
+@layer components {
+  /* Editorial prose block: eyebrow, heading, a couple of paragraphs, held at
+     the reading measure rather than the full content width. */
+  .prose-block {
+    max-width: var(--width-article);
+  }
+
+  .prose-block__eyebrow {
+    margin-block-end: var(--flow-label);
+  }
+
+  .prose-block__heading {
+    margin-block-end: var(--flow-heading);
+  }
+
+  .prose-block__body {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+  }
+
+  .prose-block__body + .prose-block__body {
+    margin-block-start: var(--flow-text);
+  }
+
+  /* --- "What you'll find here" -------------------------------------------
+     A described list, not cards: this section explains the rooms, while
+     "Start with your space" lower down navigates to them. Hairlines rather
+     than boxes keep it editorial. */
+  .about-index {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 48rem) {
+    .about-index {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--grid-gap);
+    }
+  }
+
+  .about-index__item {
+    padding-block: var(--space-md);
+    border-block-end: 1px solid var(--color-border);
+    /* Grid items default to min-content width; see §32 of design-system.md. */
+    min-width: 0;
+  }
+
+  .about-index__name {
+    font-family: var(--font-interface);
+    font-size: var(--text-h4);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    margin-block-end: var(--flow-label);
+  }
+
+  .about-index__link {
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  /* Hover carries an underline as well as colour, never hue alone. */
+  .about-index__link:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+  }
+
+  .about-index__description {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+  }
+
+  /* --- "Start with your space" -------------------------------------------
+     The lighter CategoryCard, so the end of a reading page does not repeat the
+     homepage's photographic showcase. */
+  .about-rooms {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    gap: var(--space-sm);
+  }
+
+  /* --- Contact ------------------------------------------------------------ */
+  .contact-route {
+    max-width: var(--width-article);
+  }
+
+  .contact-route__body {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+  }
+
+  .contact-route__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-lg);
+  }
+
+  .contact-reasons {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--grid-gap-row) var(--grid-gap);
+  }
+
+  @media (min-width: 48rem) {
+    .contact-reasons {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .contact-reasons__item {
+    min-width: 0;
+    padding-block-start: var(--space-sm);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .contact-reasons__title {
+    font-family: var(--font-interface);
+    font-size: var(--text-h4);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    color: var(--color-ink);
+    margin-block-end: var(--flow-label);
+  }
+
+  .contact-reasons__description {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+  }
+
+  /* Two actions under the closing CTA on About and Contact. */
+  .editorial-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-lg);
+  }
+
+  /* A button's intrinsic width is its label plus its horizontal padding, and
+     both are in rem — so at a 200% text size a two-word label needs ~200px.
+     Inside the contact placeholder, whose own padding leaves ~95px at 320px,
+     the button broke out of the dashed panel by ~41px and pushed the page 1px
+     wide (found in the Step 14 audit).
+
+     Capping each action at the row width lets the label wrap instead. Same
+     reasoning as the hero's `.hero__actions > .button` cap; applied to all
+     three action rows so none can drift back. No effect at normal text sizes,
+     where every label already fits. */
+  .contact-route__actions > *,
+  .editorial-cta__actions > *,
+  .legal-actions > * {
+    max-width: 100%;
+  }
+}
+
+/* =============================================================================
+   LEGAL PAGES (/privacy/, /terms/, /affiliate-disclosure/)
+
+   The plainest layout on the site. Legal text is read start to finish, so the
+   only jobs here are measure, hierarchy and breathing room — body copy is the
+   existing `.prose`, which already caps the reading column and underlines
+   links. No imagery, no cards, no accent panels.
+   ========================================================================== */
+
+@layer components {
+  .legal-head {
+    max-width: var(--width-article);
+  }
+
+  .legal-head__eyebrow {
+    margin-block-end: var(--flow-label);
+  }
+
+  .legal-head__title {
+    margin-block-end: var(--flow-heading);
+  }
+
+  .legal-head__intro {
+    color: var(--color-text-secondary);
+  }
+
+  .legal-head__meta {
+    margin-block-start: var(--space-md);
+    font-family: var(--font-interface);
+    font-size: var(--text-meta);
+    color: var(--color-text-muted);
+  }
+
+  /* `.prose` sets the measure; this only adds the first-heading correction,
+     since the page heading above already provides the space. */
+  .legal-body > h2:first-child {
+    margin-block-start: 0;
+  }
+
+  /* Inline code is used for a couple of literal technical terms (a URL, a
+     storage API name). Quiet, so it does not turn legal text into a code
+     sample. */
+  .legal-body code {
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius-xs);
+    background-color: var(--color-surface-alt);
+    font-size: 0.9em;
+    /* A long literal must be able to break rather than widen the column. */
+    overflow-wrap: anywhere;
+  }
+
+  .legal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    max-width: var(--width-article);
+    margin-block-start: var(--space-2xl);
+    padding-block-start: var(--space-lg);
+    border-block-start: 1px solid var(--color-border);
+  }
+}

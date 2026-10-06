@@ -1,0 +1,49 @@
+/* =============================================================================
+   SpaceWise Living — DESIGN SYSTEM ENTRY POINT
+
+   This is the only stylesheet imported by the site (from BaseLayout.astro).
+   Vite inlines every @import at build time, so this is one bundled CSS file,
+   not a chain of network requests.
+
+   LOAD ORDER MATTERS — it establishes the cascade layer order declared at the
+   top of tokens.css: tokens → reset → base → layout → components → utilities.
+
+   FONTS (self-hosted, no third-party origin, no external DNS/TLS):
+     Fraunces  — editorial serif. `opsz` build: one variable file covers every
+                 weight 100–900 AND the optical-size axis, so large headlines
+                 get the refined display cut automatically. ~66 KB (latin).
+     Figtree   — interface sans. `wght` build, weights 300–900. ~20 KB (latin).
+
+   Both ship font-display: swap and unicode-range subsets, so an en-US page
+   downloads only the `latin` files (~86 KB total) and text is readable from
+   first paint using the fallback stack.
+
+   Italics are NOT loaded: Fraunces italic alone is ~80 KB and headlines rarely
+   need it. Synthetic oblique covers the rare <em> in a heading. To add real
+   italics later, import the matching `-italic.css` file here.
+   ========================================================================== */
+
+@import '@fontsource-variable/fraunces/opsz.css';
+@import '@fontsource-variable/figtree/wght.css';
+
+/* Foundations */
+@import './tokens.css';
+@import './reset.css';
+@import './typography.css';
+@import './layout.css';
+
+/* Components */
+@import './components/header.css';
+@import './components/button.css';
+@import './components/hero.css';
+@import './components/intro.css';
+@import './components/explore.css';
+@import './components/approach.css';
+@import './components/footer.css';
+@import './components/eyebrow.css';
+@import './components/image.css';
+@import './components/card.css';
+@import './components/recommendation.css';
+@import './components/cta.css';
+@import './components/article.css';
+@import './components/page.css';

@@ -1,0 +1,132 @@
+---
+/**
+ * SpaceWise Living - base page layout.
+ *
+ * SCOPE: document shell only. It establishes the things that are expensive to
+ * retrofit later - language/direction, viewport, canonical URL, title and
+ * description handling, landmark structure and a skip link - and loads the
+ * design system.
+ *
+ * The site header and footer are STILL NOT DESIGNED. They render as minimal
+ * structural chrome using design tokens, scoped to this component and marked
+ * below for replacement in the header/footer step.
+ */
+import { site } from '../config/site';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import '../styles/index.css';
+
+interface Props {
+  /** Page title, used in <title> after the brand suffix rules below. */
+  title: string;
+  /** Meta description. Omitted entirely when not supplied - never invented. */
+  description?: string;
+  /** Set true on the homepage so the title is not duplicated. */
+  isHome?: boolean;
+  /**
+   * Skip the default reading-width wrapper around <main>, so the page can run
+   * full-bleed sections and manage its own containers.
+   */
+  bare?: boolean;
+  /** Keep a page out of search results (used by the dev-only reference page). */
+  noindex?: boolean;
+}
+
+const { title, description, isHome = false, bare = false, noindex = false } = Astro.props;
+
+const pageTitle = isHome ? `${site.name} - ${site.positioning}` : `${title} | ${site.name}`;
+
+/** Canonical URL for the current page, resolved against `site` in astro.config.mjs. */
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
+---
+
+<!doctype html>
+<html lang={site.language} dir={site.direction}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    {/*
+      UNRESOLVED: final favicon / app icon set. No icon asset has been supplied
+      and none may be invented, so this empty data URI suppresses the browser's
+      default /favicon.ico request instead of shipping a placeholder mark.
+      Replace with the real icon once the asset exists (see public/icons/).
+    */}
+    <link rel="icon" href="data:," />
+
+    {/*
+      Fonts are self-hosted and bundled through src/styles/index.css, so there
+      is no third-party origin to preconnect to.
+
+      Social / Pinterest meta tags, analytics, structured data and RSS are
+      deliberately NOT here yet - they depend on the final domain, the image
+      assets and the analytics provider, all of which are unresolved.
+    */}
+    <meta name="generator" content={Astro.generator} />
+  </head>
+
+  <body>
+    {/*
+      Back-to-top target. A real element so the footer link is a genuine
+      fragment link rather than an empty href="#". tabindex="-1" means
+      activating it moves focus here as well as the scroll position, so keyboard
+      users resume from the top of the page.
+    */}
+    <div id="top" class="top-anchor" tabindex="-1"></div>
+
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <SiteHeader />
+
+    {/*
+      tabindex="-1" makes the skip-link target genuinely focusable. Without it,
+      following the fragment only moves the sequential-focus starting point,
+      which several browsers handle inconsistently - so focus would appear not
+      to move at all. `main` is not interactive, so it never matches
+      :focus-visible and the global focus ring is not drawn around the whole
+      content area (reset.css handles that via :focus:not(:focus-visible)).
+    */}
+    <main id="main-content" tabindex="-1">
+      {bare ? <slot /> : <div class="container container--article main-column"><slot /></div>}
+    </main>
+
+    <SiteFooter />
+  </body>
+</html>
+
+<style>
+  /* ===========================================================================
+     PLACEHOLDER-PAGE READABILITY
+
+     The header and footer are now real components. What remains here is the
+     minimal flow spacing for routes whose content is still a bare heading.
+     ======================================================================== */
+  .main-column {
+    padding-block: var(--space-xl);
+  }
+
+  /* Minimal readability for the Step 1 placeholder pages, whose content is
+     still unstyled semantic HTML. The reset zeroes list padding for component
+     lists, so plain content lists need it restored. :global() is required
+     because this content arrives through <slot>. Delete alongside the rest of
+     the scaffold chrome once every route is built. */
+  .main-column :global(:is(ul, ol)) {
+    padding-inline-start: var(--space-md);
+  }
+
+  .main-column :global(:is(h2, h3)) {
+    margin-block-start: var(--space-lg);
+  }
+
+  .main-column :global(:is(p, ul, ol, dl, aside)) {
+    margin-block-start: var(--space-sm);
+  }
+
+  .main-column :global(li + li) {
+    margin-block-start: var(--space-3xs);
+  }
+</style>

@@ -1,0 +1,109 @@
+/* =============================================================================
+   SpaceWise Living — THE SPACEWISE APPROACH (#approach)
+
+   Editorial supporting content: the thinking behind the site's advice, stated
+   as three principles. It is a deliberate visual pause after the image-led
+   showcase — no photograph, no icons, no call to action, no marquee. Typography
+   and spacing carry it.
+
+   Sits on the warm alternate surface, continuing the homepage's alternating
+   rhythm: hero (page) → intro (alt) → explore (page) → approach (alt).
+
+   NOT testimonials. There are no quotes, names, ratings, metrics or any other
+   social proof here, and no markup that could hold them.
+   ========================================================================== */
+
+@layer components {
+  .approach__header {
+    max-width: var(--width-article);
+    margin-block-end: var(--space-xl);
+  }
+
+  .approach__eyebrow {
+    margin-block-end: var(--flow-label);
+  }
+
+  .approach__heading {
+    margin-block-end: var(--flow-heading);
+  }
+
+  .approach__body {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+    text-wrap: pretty;
+  }
+
+  /* ---------------------------------------------------------------------------
+     PRINCIPLES
+
+     Open editorial blocks, not cards: no surface fill, no box, no shadow. The
+     only separator is a hairline rule above each one, which reads as an
+     editorial division both in columns and when stacked.
+
+     One column below 64rem, three above. It goes straight from one to three —
+     a two-column step would leave the third principle orphaned on its own row.
+     ------------------------------------------------------------------------ */
+  .approach__list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  @media (min-width: 64rem) {
+    .approach__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--grid-gap);
+    }
+  }
+
+  .approach__item {
+    padding-block-start: var(--space-md);
+    border-block-start: 1px solid var(--color-border-strong);
+  }
+
+  /* Subtle marker, not a badge: eyebrow-sized, tracked, sage. `tabular-nums`
+     keeps 01/02/03 the same width so the three columns align exactly.
+
+     aria-hidden because the <ol> already conveys the order; announcing "01"
+     before each title would just repeat it. */
+  .approach__number {
+    font-family: var(--font-interface);
+    font-size: var(--text-eyebrow);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-eyebrow);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-accent);
+    margin-block-end: var(--space-2xs);
+  }
+
+  /* Editorial serif, matching the card titles elsewhere on the page. */
+  .approach__title {
+    font-family: var(--font-editorial);
+    font-size: var(--text-h4);
+    font-weight: var(--weight-editorial);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-heading);
+    color: var(--color-ink);
+    margin-block-end: var(--space-2xs);
+  }
+
+  .approach__description {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+    /* Comfortable measure while the list is still a single column. */
+    max-width: var(--width-narrow);
+    text-wrap: pretty;
+  }
+
+  @media (min-width: 64rem) {
+    .approach__description {
+      max-width: none;
+    }
+  }
+}

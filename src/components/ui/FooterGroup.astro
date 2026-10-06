@@ -1,0 +1,24 @@
+---
+/**
+ * FooterGroup - a labelled column of links in the site footer.
+ *
+ * Link data comes from src/config/navigation.ts, so updating navigation never
+ * means editing a template.
+ */
+interface Props {
+  title: string;
+  links: { href: string; label: string }[];
+  class?: string;
+}
+
+const { title, links, class: className } = Astro.props;
+---
+
+<div class:list={['footer-group', className]}>
+  <h2 class="footer-group__title">{title}</h2>
+  <ul class="footer-group__list">
+    {links.map((link) => (
+      <li><a href={link.href}>{link.label}</a></li>
+    ))}
+  </ul>
+</div>

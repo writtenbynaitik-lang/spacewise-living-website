@@ -1,0 +1,71 @@
+---
+/**
+ * /articles/ — Article index.
+ *
+ * The primary Pinterest landing target after the homepage, and the destination
+ * of the header's "Explore ideas" action, so it has to read as a real section
+ * front even while nothing is published.
+ *
+ * SECTION ORDER: hero → featured → latest ideas → browse by room
+ *                → editorial CTA → footer
+ *
+ * "Browse by room" reuses the homepage's ExploreSection component unchanged
+ * rather than growing a second category-card style. The component is not
+ * modified here — it is only composed — so the homepage is unaffected.
+ *
+ * HONEST STATE: no articles exist yet, so the featured slot and the list render
+ * their reserved/empty states. No article titles, dates, bylines or counts are
+ * invented to make the page look populated.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/page/PageHero.astro';
+import FeaturedSlot from '../../components/page/FeaturedSlot.astro';
+import ArticleList from '../../components/page/ArticleList.astro';
+import ExploreSection from '../../components/ExploreSection.astro';
+import EditorialCta from '../../components/page/EditorialCta.astro';
+import { getPublishedArticles, toCardDataList } from '../../lib/articles';
+
+const articles = await getPublishedArticles();
+
+const [featured, ...rest] = articles;
+const featuredCard = featured ? (await toCardDataList([featured]))[0] : undefined;
+const listCards = await toCardDataList(rest);
+---
+
+<BaseLayout
+  title="Articles"
+  description="Practical organization ideas, storage solutions, and small-space inspiration for making every room work harder."
+  bare
+>
+  <PageHero
+    eyebrow="SpaceWise journal"
+    title="Articles"
+    deck="Practical organization ideas, storage solutions, and small-space inspiration for making every room work harder."
+  />
+
+  <FeaturedSlot
+    heading="The featured guide"
+    article={featuredCard}
+    placeholderNote="The lead SpaceWise Living guide will appear here once it is published."
+  />
+
+  <ArticleList
+    heading="Latest ideas"
+    articles={listCards}
+    emptyMessage="Articles will appear here as SpaceWise Living publishes new organization ideas. Each one takes a single small-space problem and works through a practical way to solve it."
+  />
+
+  <ExploreSection
+    eyebrow="Browse by room"
+    heading="Find ideas for your room"
+    intro="Every guide belongs to a room. Start with the one that is bothering you most."
+  />
+
+  <EditorialCta
+    eyebrow="Keep exploring"
+    heading="Make more room for the life you actually live."
+    body="Explore more practical organization ideas for making small spaces feel calmer, smarter, and easier to live in."
+    href="/"
+    actionLabel="Back to home"
+  />
+</BaseLayout>

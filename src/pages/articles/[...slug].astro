@@ -1,0 +1,296 @@
+---
+/**
+ * /articles/[article-slug]/ — Article page.
+ *
+ * The single shared template every article renders through, which is why
+ * per-article layouts are avoided: the Pinterest-facing reading experience is
+ * improved in exactly one place.
+ *
+ * WHAT IT RENDERS, all driven by frontmatter (see src/content.config.ts):
+ *   category · title · excerpt · author · published / updated dates ·
+ *   reading time · hero image · MDX body · affiliate recommendations ·
+ *   affiliate disclosure · FAQ · related articles · closing CTA
+ *
+ * Every one of those blocks is conditional. An article supplying only the
+ * required fields renders a clean page with no empty furniture, and nothing is
+ * substituted for a missing field — no guessed byline, no invented date, no
+ * stand-in image.
+ *
+ * CURRENT STATE: `src/content/articles/` is empty, so `getStaticPaths` returns
+ * no paths and this route builds zero pages. The template is structural and has
+ * no content of its own; it waits for real articles.
+ *
+ * RELATED-ARTICLE REFERENCES: Astro resolves `reference()` lazily, so a slug
+ * matching no file does NOT fail the build by itself — it would silently render
+ * nothing. They are therefore resolved eagerly in `getStaticPaths` below, which
+ * turns a dangling slug into a build failure. This is the behaviour the content
+ * schema's comment requires of this page.
+ */
+import type { GetStaticPaths } from 'astro';
+import { Picture } from 'astro:assets';
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/ui/Container.astro';
+import Section from '../../components/ui/Section.astro';
+import Eyebrow from '../../components/ui/Eyebrow.astro';
+import Button from '../../components/ui/Button.astro';
+import MetadataRow from '../../components/ui/MetadataRow.astro';
+import ArticleCard from '../../components/ui/ArticleCard.astro';
+import ProductRecommendation from '../../components/ui/ProductRecommendation.astro';
+import { getCategory } from '../../config/categories';
+import { site } from '../../config/site';
+import { formatDate, toCardDataList, type ArticleEntry } from '../../lib/articles';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const articles = await getCollection('articles', ({ data }) =>
+    import.meta.env.PROD ? data.draft !== true : true
+  );
+
+  const routes = [];
+  for (const article of articles) {
+    /*
+      Resolve related articles here, not at render time. getEntry() returns
+      undefined for an unknown slug, so without this check a typo would ship a
+      page with a silently missing "related" section.
+    */
+    const related: ArticleEntry[] = [];
+    for (const ref of article.data.relatedArticles) {
+      const entry = await getEntry(ref);
+      if (!entry) {
+        throw new Error(
+          `Article "${article.id}" lists relatedArticles entry "${ref.id}", which does not exist.`
+        );
+      }
+      related.push(entry as ArticleEntry);
+    }
+
+    routes.push({
+      // Frontmatter `slug` wins so a URL can change without renaming the file.
+      params: { slug: article.data.slug ?? article.id },
+      props: { article, related },
+    });
+  }
+
+  return routes;
+};
+
+interface Props {
+  article: ArticleEntry;
+  related: ArticleEntry[];
+}
+
+const { article, related } = Astro.props as Props;
+const { Content } = await render(article);
+const data = article.data;
+
+const category = getCategory(data.category);
+/** Omitted rather than guessed when no byline has been established. */
+const author = data.author ?? site.defaultAuthor ?? undefined;
+
+const relatedCards = await toCardDataList(related);
+
+/** The disclosure is shown only when there is actually an affiliate link. */
+const hasAffiliate = data.affiliate.length > 0;
+
+const HERO_SIZES = '(min-width: 70rem) 1120px, 92vw';
+const HERO_WIDTHS = [640, 960, 1280, 1680];
+---
+
+<BaseLayout
+  title={data.seoTitle ?? data.title}
+  description={data.seoDescription ?? data.excerpt}
+  bare
+>
+  <article>
+    {/* --- Header: category → title → deck → metadata ------------------- */}
+    <Section space="lg" flushBottom>
+      <Container width="article">
+        <header class="article-header">
+          {
+            category && (
+              <a class="article-header__category" href={`/${category.slug}/`}>
+                {category.name}
+              </a>
+            )
+          }
+          <h1 class="t-h1 article-header__title">{data.title}</h1>
+          <p class="t-deck article-header__deck">{data.excerpt}</p>
+
+          <MetadataRow
+            class="article-header__meta"
+            author={author}
+            date={data.publishedDate.toISOString()}
+            dateLabel={formatDate(data.publishedDate)}
+            readingTimeMinutes={data.readingTimeMinutes}
+          />
+
+          {
+            data.updatedDate && (
+              <p class="t-meta">
+                Updated{' '}
+                <time datetime={data.updatedDate.toISOString()}>
+                  {formatDate(data.updatedDate)}
+                </time>
+              </p>
+            )
+          }
+        </header>
+      </Container>
+    </Section>
+
+    {/* --- Hero image --------------------------------------------------- */}
+    {
+      data.heroImage && (
+        <Section space="sm" flushTop flushBottom>
+          <Container width="content">
+            <figure class="article-figure article-figure--wide">
+              <div class="frame">
+                <Picture
+                  src={data.heroImage.src}
+                  alt={data.heroImage.alt}
+                  widths={HERO_WIDTHS}
+                  sizes={HERO_SIZES}
+                  formats={['avif', 'webp']}
+                  fallbackFormat="jpeg"
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
+              {data.heroImage.caption && (
+                <figcaption>{data.heroImage.caption}</figcaption>
+              )}
+            </figure>
+          </Container>
+        </Section>
+      )
+    }
+
+    {/* --- Body: section headings and inline images come from the MDX --- */}
+    <Section>
+      <Container width="article">
+        <div class="prose">
+          <Content />
+        </div>
+      </Container>
+    </Section>
+
+    {/* --- Affiliate recommendations ------------------------------------
+         Rendered after the body today. `placement` is carried in the schema so
+         a later step can inject each one beside the section it belongs to
+         without changing the content files. ------------------------------- */}
+    {
+      hasAffiliate && (
+        <Section tone="alt" aria-labelledby="article-solutions-heading">
+          <Container width="article">
+            <header class="section-head">
+              <Eyebrow class="section-head__eyebrow">Storage solutions</Eyebrow>
+              <h2 class="t-h2 section-head__heading" id="article-solutions-heading">
+                Products that help
+              </h2>
+            </header>
+
+            <div class="solutions">
+              {data.affiliate.map((item) => (
+                <ProductRecommendation
+                  problem={item.whyItHelps}
+                  name={item.name}
+                  explanation={item.whyItHelps}
+                  href={item.url}
+                  linkLabel={item.retailer ? `View at ${item.retailer}` : 'View product'}
+                />
+              ))}
+            </div>
+
+            {/* Required whenever an affiliate link is present. */}
+            <p class="t-body-sm article-disclosure">
+              Some links above are affiliate links. See the{' '}
+              <a href="/affiliate-disclosure/">affiliate disclosure</a> for how
+              this works.
+            </p>
+          </Container>
+        </Section>
+      )
+    }
+
+    {/* --- FAQ ----------------------------------------------------------- */}
+    {
+      data.faq.length > 0 && (
+        <Section aria-labelledby="article-faq-heading">
+          <Container width="article">
+            <header class="section-head">
+              <h2 class="t-h2 section-head__heading" id="article-faq-heading">
+                Common questions
+              </h2>
+            </header>
+
+            <div class="faq">
+              {data.faq.map((entry) => (
+                <details class="faq__item">
+                  <summary class="faq__question">{entry.question}</summary>
+                  <div class="faq__answer">
+                    <p>{entry.answer}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )
+    }
+
+    {/* --- Related articles ---------------------------------------------- */}
+    {
+      relatedCards.length > 0 && (
+        <Section tone="alt" aria-labelledby="article-related-heading">
+          <Container width="content">
+            <header class="section-head">
+              <h2 class="t-h2 section-head__heading" id="article-related-heading">
+                Read next
+              </h2>
+            </header>
+
+            <ul class="article-grid">
+              {relatedCards.map((item) => (
+                <li>
+                  <ArticleCard
+                    variant="compact"
+                    title={item.title}
+                    href={item.href}
+                    eyebrow={item.eyebrow}
+                    image={item.image}
+                    readingTimeMinutes={item.readingTimeMinutes}
+                  />
+                </li>
+              ))}
+            </ul>
+          </Container>
+        </Section>
+      )
+    }
+
+    {/* --- Closing CTA ---------------------------------------------------
+         Rendered only when the article supplies one. No default destination is
+         invented, and no email capture exists. ---------------------------- */}
+    {
+      data.cta && (
+        <Section tone="accent" aria-labelledby="article-cta-heading">
+          <Container width="content">
+            <div class="editorial-cta">
+              <h2 class="t-h2 editorial-cta__heading" id="article-cta-heading">
+                {data.cta.heading}
+              </h2>
+              <p class="editorial-cta__body">{data.cta.body}</p>
+              {data.cta.href && (
+                <div class="editorial-cta__action">
+                  <Button href={data.cta.href} variant="primary">
+                    {data.cta.linkLabel ?? 'Learn more'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </Container>
+        </Section>
+      )
+    }
+  </article>
+</BaseLayout>

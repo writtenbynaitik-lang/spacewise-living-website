@@ -1,0 +1,137 @@
+---
+/**
+ * /terms/ — Terms of Use.
+ *
+ * DELIBERATELY GENERAL. No legal entity, company number, registered address,
+ * governing law, jurisdiction, arbitration clause, registered trademark or
+ * dispute process is named, because none exists in the project. Inventing any
+ * of them would be the single most damaging thing this page could do: a made-up
+ * governing law is worse than none at all.
+ *
+ * The site is described as what it verifiably is — an informational editorial
+ * website about small-space organization — and not as a retailer, shop,
+ * consultancy, design service or manufacturer.
+ *
+ * This is website copy, not legal advice, and no compliance claim is made.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LegalPage from '../components/page/LegalPage.astro';
+import { site } from '../config/site';
+---
+
+<BaseLayout
+  title="Terms of Use"
+  description="The general terms for using the SpaceWise Living website."
+  bare
+>
+  <LegalPage
+    eyebrow="Legal / Terms"
+    title="Terms of Use"
+    intro={`These Terms of Use describe the general terms for using the ${site.name} website.`}
+    contactIntro="If you have a question about these terms, you can get in touch once a contact route is available."
+  >
+    <h2>Using this website</h2>
+    <p>
+      {site.name} is an informational, editorial website about small-space
+      organization and storage ideas. It publishes articles and room guides to
+      read. It is not a shop, a design or consulting service, a manufacturer or
+      a retailer, and it does not sell products or take orders.
+    </p>
+    <p>
+      You are welcome to read, use and share the ideas here. Please do not use
+      the site in a way that disrupts it or interferes with other people's use
+      of it.
+    </p>
+
+    <h2>Content and information</h2>
+    <p>
+      Everything published here is general information and inspiration. Homes,
+      rooms and circumstances differ enormously, so an idea that works well in
+      one space may not suit another.
+    </p>
+    <p>
+      Nothing on this site is a guarantee of a particular result. No promise is
+      made about how much space you will save, how a product will perform, how
+      long something will last, or what any change will cost.
+    </p>
+
+    <h2>No professional advice</h2>
+    <p>
+      Organization and storage content here is general information, not
+      professional advice. Judge it against your own space — your measurements,
+      your fittings, your walls and floors, and what your household actually
+      needs. Where a change involves structural work, fixings, electrics or
+      anything load-bearing, or where you are unsure whether something is safe
+      or permitted, consult a qualified professional and check any rules that
+      apply to your building or tenancy.
+    </p>
+
+    <h2>Intellectual property</h2>
+    <p>
+      The original text, design, layout and branding of this website belong to
+      {' '}{site.name}. Please do not republish them wholesale as your own.
+      Quoting a short passage with a link back is welcome.
+    </p>
+    <p>
+      Material that belongs to other people — including anything reached through
+      a link — remains theirs and is used or referenced under their terms, not
+      claimed here.
+    </p>
+
+    <h2>Third-party links</h2>
+    <p>
+      This site links to other websites. Those sites are independently operated:
+      we do not control their content, their policies, their prices, their
+      availability or how they behave, and a link is not an endorsement of
+      everything on the other end of it. Your dealings with them are between you
+      and them.
+    </p>
+
+    <h2>Affiliate links and recommendations</h2>
+    <p>
+      Some links on this site may, in future, be affiliate links, which means a
+      commission may be earned when a purchase is made through them. No
+      affiliate programme has been set up and no affiliate links are published
+      here today. Where such links do appear, they will be disclosed — see the
+      {' '}<a href="/affiliate-disclosure/">affiliate disclosure</a>.
+    </p>
+    <p>
+      A recommendation is an editorial suggestion about what tends to help with
+      a particular storage problem. It is not a warranty, and no promise is made
+      that any linked product is in stock, still sold, or suitable for your
+      space.
+    </p>
+
+    <h2>Accuracy and availability</h2>
+    <p>
+      Content may be edited, corrected, added to or removed at any time, and
+      pages may move or be taken down. Information that was accurate when
+      published may not stay that way — particularly anything about products,
+      prices or availability on other websites, which we do not control.
+    </p>
+    <p>
+      The site is offered as it is. No promise is made that it will always be
+      available or free of errors.
+    </p>
+
+    <h2>Limitation of liability</h2>
+    <p>
+      You use this website and act on its ideas at your own discretion. To the
+      extent permitted by law, {site.name} is not liable for loss or damage
+      arising from using the site, relying on its content, or using any
+      third-party website reached from it.
+    </p>
+    <p>
+      Nothing here is intended to limit any right you have that cannot be
+      limited by law.
+    </p>
+
+    <h2>Changes to these terms</h2>
+    <p>
+      These terms describe the website as it is currently built, and will be
+      updated as it develops — for example if a contact route, a newsletter or
+      affiliate links are added. The date at the top of this page shows when the
+      wording last changed.
+    </p>
+  </LegalPage>
+</BaseLayout>

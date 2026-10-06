@@ -1,0 +1,133 @@
+/* =============================================================================
+   SpaceWise Living — HOMEPAGE INTRODUCTION
+
+   The first content section below the hero. An editorial two-column feature,
+   not a generic "about us" block and not a row of cards.
+
+   It reuses the design system wholesale: `.section--alt` for the warm surface,
+   `.grid--asymmetric-reverse` for the column split, `.frame` for the image box
+   and `.eyebrow` / `.t-h2` for type. The only rules here are the handful that
+   are genuinely specific to this section.
+
+   NO MARQUEE. There is deliberately no horizontal text track, looping strip,
+   scroll-speed effect or any other continuous animation in this section — so
+   there is no marquee CSS, no marquee JavaScript and no motion to manage.
+   ========================================================================== */
+
+@layer components {
+  .intro__text {
+    /* Keeps the paragraph at a comfortable measure while the section is still
+       stacked, before the grid takes over at 64rem. */
+    max-width: var(--width-article);
+  }
+
+  .intro__eyebrow {
+    margin-block-end: var(--flow-label);
+  }
+
+  .intro__heading {
+    /* Type comes from .t-h2 (editorial serif); this only sets the rhythm. */
+    margin-block-end: var(--flow-heading);
+  }
+
+  .intro__body {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+    /* Narrower than the column so the paragraph never runs the full width. */
+    max-width: var(--width-narrow);
+    text-wrap: pretty;
+  }
+
+  /* ---------------------------------------------------------------------------
+     EMPHASIS
+
+     Restrained and editorial: the emphasised phrase steps up from the secondary
+     ink to full ink with a small weight increase. Deliberately NOT italic —
+     neither font ships an italic face, so `font-style: italic` would render a
+     synthetic oblique — and deliberately not bold, which would shout.
+
+     It stays an <em> in the markup, so assistive technology still gets the
+     emphasis; only the visual treatment changes. The sentence reads identically
+     without it, so nothing depends on the styling alone.
+     ------------------------------------------------------------------------ */
+  .intro__emphasis {
+    font-style: normal;
+    font-weight: var(--weight-medium);
+    color: var(--color-ink);
+  }
+
+  /* ---------------------------------------------------------------------------
+     MEDIA
+     ------------------------------------------------------------------------ */
+  .intro__media {
+    --frame-ratio: var(--ratio-landscape);
+    width: 100%;
+    /* The supporting photograph is 3:2, exactly the frame's ratio, so it fills
+       the box with no crop at all.
+
+       While stacked, the section height is kept in check by limiting the media's
+       WIDTH rather than its height. An earlier `max-height` cap did control the
+       height, but it forced the box to 2.6:1 at 1024px and cut 42% of the image
+       vertically - clipping the open under-bed drawers and the baskets above the
+       wardrobe, which are the storage features the photograph exists to show.
+       Capping the width keeps every one of them in frame at every width.
+
+       720px also sits just wider than the body copy's 576px measure, so the
+       image breathes past the text rather than lining up flush with it. */
+    max-width: var(--width-article);
+  }
+
+  .intro__media :is(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* No supporting photograph supplied yet. `.frame` defaults to
+     --color-surface-alt, which is the same colour as this section's own
+     background and would disappear, so the empty slot uses --color-surface
+     instead: a quiet warm panel that reads as intentional and keeps the
+     two-column composition intact. Both are existing design tokens.
+
+     Selector is doubled so it out-specifies `.frame`'s own background
+     regardless of stylesheet import order - image.css loads after this file,
+     and at equal specificity it would otherwise win and the slot would vanish
+     into the section background. */
+  .frame.intro__media--empty {
+    background-color: var(--color-surface);
+  }
+
+  /* Same failure behaviour as the hero: hide a broken image and leave the warm
+     panel at the reserved size rather than exposing a broken-image icon. */
+  .intro__media[data-media-failed='true'] :is(img, picture) {
+    display: none;
+  }
+
+  /* ---------------------------------------------------------------------------
+     TWO COLUMNS — from 70rem / 1120px
+
+     Not the design system's `.grid--asymmetric-reverse`, which starts at 64rem.
+     Measured there: the text column came out at 367px, roughly 45 characters a
+     line, which is cramped for reading. Switching at 70rem instead - the same
+     point the header changes - keeps the column at 406px and above.
+
+     Text ~42%, image ~58%, so the photograph stays the larger element.
+     ------------------------------------------------------------------------ */
+  @media (min-width: 70rem) {
+    .intro__inner {
+      grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
+      align-items: center;
+    }
+
+    .intro__text {
+      max-width: none;
+    }
+
+    .intro__media {
+      /* Side by side, the grid column already constrains the width. */
+      max-width: none;
+    }
+  }
+}

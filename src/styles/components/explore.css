@@ -1,0 +1,204 @@
+/* =============================================================================
+   SpaceWise Living — "EXPLORE BY ROOM" SHOWCASE (#explore)
+
+   Category discovery, not a portfolio, product catalogue or article feed. Each
+   card answers one question: "is this the room I want to work on?"
+
+   Sits on the default page background, so it reads as a clear step away from
+   the warm beige of #intro without introducing any new colour.
+
+   NO carousel, no scroll-snapping, no horizontal scroller, no counter, no
+   progress indicator, no auto-play — it is a plain CSS grid of links, and it
+   works with JavaScript unavailable because it ships none.
+   ========================================================================== */
+
+@layer components {
+  .explore__header {
+    max-width: var(--width-article);
+    margin-block-end: var(--space-xl);
+  }
+
+  .explore__eyebrow {
+    margin-block-end: var(--flow-label);
+  }
+
+  .explore__heading {
+    margin-block-end: var(--flow-heading);
+  }
+
+  .explore__intro {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+    text-wrap: pretty;
+  }
+
+  /* ---------------------------------------------------------------------------
+     GRID
+     One column on phones, two from 48rem, four from 64rem. Breakpoints follow
+     when a card stops having room for its image and description rather than
+     device labels.
+     ------------------------------------------------------------------------ */
+  .explore__grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--grid-gap-row) var(--grid-gap);
+  }
+
+  @media (min-width: 48rem) {
+    .explore__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .explore__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     CARD
+     Image-led and flat: no surface fill, no border box, no shadow. It reads as
+     editorial navigation rather than an app tile, which is what separates this
+     from a generic SaaS card grid.
+     ------------------------------------------------------------------------ */
+  .explore-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    height: 100%;
+  }
+
+  .explore-card__media {
+    margin-block-end: var(--space-2xs);
+  }
+
+  /* The frame's own --color-surface-alt is the fallback surface when no
+     photograph exists; on this page background it is clearly visible. */
+  .explore-card__frame {
+    --frame-ratio: var(--ratio-landscape);
+  }
+
+  .explore-card__frame :is(img) {
+    width: 100%;
+    height: 100%;
+    /* Fills the 3:2 frame without distortion. Seven of the eight photographs
+       are already 3:2, so nothing is cropped; `small-spaces` is 16:9 and loses
+       ~16% from the sides, where centre keeps its pantry, under-bed drawers and
+       sofa storage all in view. Stated explicitly rather than left to the
+       default, so the intent is on the record. */
+    object-fit: cover;
+    object-position: 50% 50%;
+  }
+
+  .explore-card__title {
+    font-family: var(--font-editorial);
+    font-size: var(--text-h4);
+    font-weight: var(--weight-editorial);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-heading);
+    color: var(--color-ink);
+  }
+
+  /* Stretched link: the title is the link, so its text is the accessible name
+     ("Kitchen"), while the whole card is the hit area. One anchor per card,
+     no nested interactive elements. */
+  .explore-card__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .explore-card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-md);
+  }
+
+  .explore-card__description {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+    text-wrap: pretty;
+  }
+
+  /* Decorative view indicator, pinned to the bottom so cards in a row align
+     regardless of how long their descriptions run. */
+  .explore-card__indicator {
+    margin-block-start: auto;
+    padding-block-start: var(--space-2xs);
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-accent);
+  }
+
+  .explore-card__indicator svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  /* ---------------------------------------------------------------------------
+     INTERACTION
+
+     Hover and keyboard focus get the SAME treatment, so nothing depends on a
+     pointer. Three signals, none of them colour alone: the title underlines,
+     the arrow shifts, and the image scales very slightly.
+     ------------------------------------------------------------------------ */
+  .explore-card__title,
+  .explore-card__indicator svg,
+  .explore-card__frame :is(img) {
+    transition: color var(--duration-fast) var(--ease-standard),
+      transform var(--duration-slow) var(--ease-out);
+  }
+
+  .explore-card:hover .explore-card__title,
+  .explore-card:focus-within .explore-card__title {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  .explore-card:hover .explore-card__indicator svg,
+  .explore-card:focus-within .explore-card__indicator svg {
+    transform: translateX(0.2em);
+  }
+
+  .explore-card:hover .explore-card__frame :is(img),
+  .explore-card:focus-within .explore-card__frame :is(img) {
+    transform: scale(1.03);
+  }
+
+  /* Focus ring around the whole card, not the invisible stretched element. */
+  .explore-card:focus-within {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: 6px;
+    border-radius: var(--radius-md);
+  }
+
+  .explore-card:focus-within .explore-card__link:focus-visible {
+    outline: none;
+  }
+
+  /* Reduced motion: drop the movement, keep every other signal. The underline
+     and colour change still mark hover and focus, so nothing is lost. */
+  @media (prefers-reduced-motion: reduce) {
+    .explore-card__title,
+    .explore-card__indicator svg,
+    .explore-card__frame :is(img) {
+      transition: none;
+    }
+
+    .explore-card:hover .explore-card__indicator svg,
+    .explore-card:focus-within .explore-card__indicator svg,
+    .explore-card:hover .explore-card__frame :is(img),
+    .explore-card:focus-within .explore-card__frame :is(img) {
+      transform: none;
+    }
+  }
+}

@@ -1,0 +1,157 @@
+/* =============================================================================
+   SpaceWise Living — BUTTONS
+   Three levels only: primary (the action), secondary (lower emphasis), and
+   text/link (editorial, lightweight).
+
+   Accessibility rules applied throughout:
+     - every interactive state is expressed by more than colour
+       (border, underline, background, or movement — never hue alone)
+     - minimum 44px tap target on primary and secondary
+     - :focus-visible uses the global ring, which sits on the page background
+   ========================================================================== */
+
+@layer components {
+  .button {
+    /* shared base */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2xs);
+    min-height: var(--tap-target-min);
+    padding: var(--space-xs) var(--space-md);
+    border: 1px solid transparent;
+    border-radius: var(--radius-button);
+    font-family: var(--font-interface);
+    font-size: var(--text-button);
+    font-weight: var(--weight-semibold);
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--duration-base) var(--ease-standard),
+      border-color var(--duration-base) var(--ease-standard),
+      color var(--duration-base) var(--ease-standard);
+  }
+
+  /* -- Primary -------------------------------------------------------------
+     The one place the sage accent carries a solid fill. Label contrast on the
+     accent is 5.86:1, and 7.67:1 on the hover shade. */
+  .button--primary {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .button--primary:hover {
+    background-color: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+  }
+
+  .button--primary:active {
+    background-color: var(--color-accent-hover);
+    /* A real positional nudge, so the pressed state is not colour-only. */
+    transform: translateY(1px);
+  }
+
+  /* -- Secondary -----------------------------------------------------------
+     Outlined. The border uses --color-border-interactive (3.27:1 on the page),
+     which is the non-text contrast minimum for a control boundary. */
+  .button--secondary {
+    background-color: transparent;
+    border-color: var(--color-border-interactive);
+    color: var(--color-ink);
+  }
+
+  .button--secondary:hover {
+    background-color: var(--color-surface-alt);
+    border-color: var(--color-ink);
+  }
+
+  .button--secondary:active {
+    background-color: var(--color-surface-alt);
+    transform: translateY(1px);
+  }
+
+  /* -- Text / link ---------------------------------------------------------
+     Editorial and lightweight. Always underlined or arrowed so it is
+     identifiable without relying on colour. */
+  .button--text {
+    min-height: 0;
+    padding: var(--space-3xs) 0;
+    border: none;
+    border-radius: var(--radius-xs);
+    background: none;
+    color: var(--color-ink);
+    font-weight: var(--weight-semibold);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent-border);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em;
+  }
+
+  .button--text:hover {
+    color: var(--color-accent);
+    text-decoration-color: var(--color-accent);
+  }
+
+  /* Arrow microinteraction: a small, purposeful slide. Movement is decorative
+     only — the underline already identifies the link. */
+  .button__arrow {
+    flex: none;
+    width: 1em;
+    height: 1em;
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+
+  .button:hover .button__arrow {
+    transform: translateX(0.2em);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button:hover .button__arrow { transform: none; }
+    .button:active { transform: none; }
+  }
+
+  /* -- Sizes --------------------------------------------------------------- */
+  .button--sm {
+    min-height: 36px;
+    padding: var(--space-2xs) var(--space-sm);
+    font-size: var(--text-body-sm);
+  }
+
+  .button--lg {
+    min-height: 52px;
+    padding: var(--space-sm) var(--space-xl);
+    font-size: var(--text-body);
+  }
+
+  .button--full { width: 100%; }
+
+  /* -- Disabled ------------------------------------------------------------
+     The state is carried by the `disabled` attribute (or aria-disabled), which
+     is what assistive technology reads. The visual treatment is a supporting
+     cue, never the only one. */
+  .button:disabled,
+  .button[aria-disabled='true'] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .button:disabled:hover,
+  .button[aria-disabled='true']:hover {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .button--secondary:disabled:hover,
+  .button--secondary[aria-disabled='true']:hover {
+    background-color: transparent;
+    border-color: var(--color-border-interactive);
+  }
+
+  .button:disabled .button__arrow,
+  .button[aria-disabled='true'] .button__arrow {
+    transform: none;
+  }
+}

@@ -1,0 +1,126 @@
+---
+/**
+ * /affiliate-disclosure/ — Affiliate Disclosure.
+ *
+ * THE CENTRAL FACT: no affiliate programme is configured. The project was
+ * searched for affiliate networks, tracking identifiers, programme names,
+ * commission terms and product URLs — none exists. `site.ts` still lists
+ * "final affiliate program + product URLs" as unresolved, the article
+ * collection is empty, and `getPublishedArticles()` returns nothing, so there
+ * is not a single affiliate link on this website today.
+ *
+ * ON AMAZON SPECIFICALLY: Amazon appears in the project brief only as a DESIGN
+ * CONSTRAINT — "must not feel like an Amazon affiliate site" — and in the
+ * unresolved-inputs list. That is not a configured relationship, and there is
+ * no approved Associates disclosure wording anywhere in the project. So Amazon
+ * is not named as a partner here and no programme-specific or required-form
+ * wording is reproduced. Inventing a tracking ID or quoting a programme's
+ * mandated sentence without being in that programme would be a false statement
+ * about a commercial relationship.
+ *
+ * The page therefore describes the intended model honestly, in the future
+ * tense, and says plainly that nothing is live yet. It is written to be
+ * accurate now AND to need only a small, obvious edit once a programme exists.
+ *
+ * This is website copy, not legal advice, and no compliance claim is made.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LegalPage from '../components/page/LegalPage.astro';
+import { site } from '../config/site';
+import { siteFacts } from '../config/legal';
+
+/** Verified: no programme configured, nothing published. */
+const { affiliateProgramConfigured, affiliateLinksPublished } = siteFacts;
+const anyAffiliateActivity = affiliateProgramConfigured || affiliateLinksPublished;
+---
+
+<BaseLayout
+  title="Affiliate Disclosure"
+  description="How affiliate links work on SpaceWise Living, and their current status."
+  bare
+>
+  <LegalPage
+    eyebrow="Legal / Affiliate Disclosure"
+    title="Affiliate Disclosure"
+    intro={`${site.name} is intended to use affiliate links in some of its content. This page explains what that means, and what is actually in place today.`}
+    contactHeading="Questions"
+    contactIntro="If you have a question about affiliate links on this site, you can get in touch once a contact route is available."
+  >
+    {
+      !anyAffiliateActivity && (
+        <>
+          <h2>Current status</h2>
+          <p>
+            <strong>
+              There are no affiliate links on this website at the moment.
+            </strong>{' '}
+            No affiliate programme has been set up, and no articles have been
+            published yet. Nothing on this site currently earns a commission.
+          </p>
+          <p>
+            This page is published in advance so the arrangement is clear before
+            the first such link ever appears. It will be updated to name the
+            programmes actually in use when that happens.
+          </p>
+        </>
+      )
+    }
+
+    <h2>How affiliate links work</h2>
+    <p>
+      An affiliate link is an ordinary link to a retailer that also tells that
+      retailer you arrived from here. If you buy something after following one,
+      the retailer may pay a small commission to the referring site.
+    </p>
+    <p>
+      Where {site.name} uses them, only <em>some</em> links in <em>some</em>{' '}
+      content will be affiliate links. Plenty of links — to reference material,
+      to makers, or simply to something worth looking at — earn nothing at all.
+    </p>
+
+    <h2>Your price does not increase</h2>
+    <p>
+      An affiliate commission is paid by the retailer out of a sale that has
+      already happened. Following an affiliate link does not add anything to
+      what you pay, and it does not change the price you are shown.
+    </p>
+
+    <h2>How things are chosen to feature</h2>
+    <p>
+      Recommendations here are editorial judgements about what tends to help
+      with a specific small-space problem — whether something suits an awkward
+      corner, a shallow cabinet or a shared room.
+    </p>
+    <p>
+      To be straightforward about it: these are not hands-on product reviews.
+      Nothing on this site should be read as a claim that an item has been
+      bought, tested, measured or lived with, and no performance, durability or
+      safety testing is implied. Check the dimensions and the retailer's own
+      details against your own space before buying anything.
+    </p>
+
+    <h2>Editorial independence</h2>
+    <p>
+      Affiliate relationships do not change the purpose of the site: to publish
+      practical small-space organization ideas and useful recommendations. The
+      problem comes first and the product second — the aim is that an article is
+      worth reading even if you buy nothing at all.
+    </p>
+
+    <h2>Identifying affiliate content</h2>
+    <p>
+      Where affiliate links are used, they will be disclosed on the page that
+      contains them, near the recommendation rather than buried at the bottom,
+      so you can see which links may earn a commission before you follow one.
+    </p>
+
+    <h2>Buying from third parties</h2>
+    <p>
+      Any purchase you make is between you and the retailer. Their pricing,
+      stock, delivery, returns, warranty, support and privacy practices are
+      theirs, and {site.name} is not a party to the transaction and cannot
+      resolve problems with an order. Their terms apply once you leave this
+      site.
+    </p>
+  </LegalPage>
+</BaseLayout>

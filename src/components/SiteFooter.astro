@@ -1,0 +1,77 @@
+---
+/**
+ * SpaceWise Living - site footer. Shared across every page via BaseLayout.
+ *
+ * Editorial rather than a corporate mega-footer: the brand leads, three link
+ * groups follow at lower visual weight, then a quiet bottom bar.
+ *
+ * Every destination is a real route in src/pages/, taken from
+ * src/config/navigation.ts. There are deliberately NO social links - no profile
+ * URL has been supplied, so the group is omitted entirely rather than filled
+ * with placeholders - and no email, phone, address or credit line, for the same
+ * reason.
+ *
+ * Ships no JavaScript: back-to-top is an ordinary fragment link.
+ */
+import Container from './ui/Container.astro';
+import FooterGroup from './ui/FooterGroup.astro';
+import { footerExplore, footerMore, footerLegal } from '../config/navigation';
+import { site } from '../config/site';
+
+/**
+ * Approved footer brand line. Kept here rather than derived from
+ * `site.positioning`, which is worded differently.
+ */
+const description =
+  'Smart storage ideas and practical organization inspiration for making the ' +
+  'most of small spaces.';
+
+/** Approved copyright year. */
+const copyrightYear = 2026;
+---
+
+<footer class="site-footer">
+  <Container width="content">
+    <div class="site-footer__inner">
+      <div class="site-footer__brand-area">
+        {/*
+          UNRESOLVED: final logo asset. The mark is set in type, as everywhere
+          else - no logo graphic is invented.
+        */}
+        <a class="site-footer__wordmark" href="/" aria-label={`${site.name} — Home`}>
+          {site.name}
+        </a>
+        <p class="site-footer__description">{description}</p>
+      </div>
+
+      <FooterGroup title="Explore" links={footerExplore} />
+      <FooterGroup title="More" links={footerMore} />
+      <FooterGroup title="Legal" links={footerLegal} />
+    </div>
+
+    <div class="site-footer__bottom">
+      <p class="site-footer__copyright">
+        &copy; {copyrightYear} {site.name}. All rights reserved.
+      </p>
+
+      {/*
+        Back to top. An ordinary fragment link to a real #top element, not an
+        empty href="#" and not a scripted scroller - the browser's own behaviour
+        is correct here, and the design system's smooth scrolling already sits
+        behind a prefers-reduced-motion check.
+      */}
+      <a class="site-footer__top-link" href="#top">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+          <path
+            d="M8 13.5v-11m0 0L3.5 7M8 2.5 12.5 7"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        Back to top
+      </a>
+    </div>
+  </Container>
+</footer>

@@ -1,0 +1,666 @@
+---
+/**
+ * /design-system/ - DEVELOPMENT-ONLY design system reference.
+ *
+ * WHY A DYNAMIC ROUTE: `getStaticPaths` returns an empty array in production,
+ * so this page exists while running `npm run dev` and is NEVER emitted into
+ * `dist/`. It is a verification surface for the design system, not a site page,
+ * and it must not appear in the build, the sitemap or search results.
+ *
+ * ALL CONTENT ON THIS PAGE IS PLACEHOLDER TEXT written to stress-test the
+ * design (long titles, wrapping, empty states). None of it is approved copy and
+ * none of it states a fact about the business.
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/ui/Container.astro';
+import Section from '../../components/ui/Section.astro';
+import Eyebrow from '../../components/ui/Eyebrow.astro';
+import Button from '../../components/ui/Button.astro';
+import Divider from '../../components/ui/Divider.astro';
+import ImageFrame from '../../components/ui/ImageFrame.astro';
+import ArticleCard from '../../components/ui/ArticleCard.astro';
+import CategoryCard from '../../components/ui/CategoryCard.astro';
+import MetadataRow from '../../components/ui/MetadataRow.astro';
+import ProductRecommendation from '../../components/ui/ProductRecommendation.astro';
+import CtaBlock from '../../components/ui/CtaBlock.astro';
+import FooterGroup from '../../components/ui/FooterGroup.astro';
+import { categories } from '../../config/categories';
+import { legalNav } from '../../config/navigation';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  if (import.meta.env.PROD) return [];
+  return [{ params: { slug: undefined } }];
+};
+
+/** Measured WCAG ratios, computed from the token values. */
+const colorGroups = [
+  {
+    name: 'Backgrounds',
+    swatches: [
+      { token: '--color-page', hex: '#FBF9F5', label: 'Page · warm ivory', note: 'default page background' },
+      { token: '--color-surface', hex: '#FFFDF9', label: 'Surface · warm white', note: 'cards, raised surfaces' },
+      { token: '--color-surface-alt', hex: '#F3EDE2', label: 'Surface alt · warm beige', note: 'alternate sections' },
+      { token: '--color-accent-soft', hex: '#EAEFE4', label: 'Accent soft · pale sage', note: 'accent surfaces only' },
+    ],
+  },
+  {
+    name: 'Text',
+    swatches: [
+      { token: '--color-ink', hex: '#221F1B', label: 'Ink · deep charcoal', note: '15.60:1 on page' },
+      { token: '--color-ink-secondary', hex: '#5C564E', label: 'Ink secondary · warm gray', note: '6.90:1 on page' },
+      { token: '--color-ink-muted', hex: '#706960', label: 'Ink muted · warm gray', note: '5.15:1 on page' },
+      { token: '--color-on-accent', hex: '#FFFDF9', label: 'On accent', note: '5.86:1 on accent' },
+    ],
+  },
+  {
+    name: 'Accent',
+    swatches: [
+      { token: '--color-accent', hex: '#56694E', label: 'Accent · muted sage', note: '5.66:1 on page' },
+      { token: '--color-accent-hover', hex: '#46573F', label: 'Accent hover', note: '7.67:1 with on-accent' },
+      { token: '--color-accent-border', hex: '#B9C6B0', label: 'Accent border', note: 'decorative rules only' },
+    ],
+  },
+  {
+    name: 'Borders',
+    swatches: [
+      { token: '--color-border', hex: '#E4DED3', label: 'Border · soft warm gray', note: 'decorative hairlines' },
+      { token: '--color-border-strong', hex: '#D3CABB', label: 'Border strong', note: 'grouping separation' },
+      { token: '--color-border-interactive', hex: '#8F8A7D', label: 'Border interactive', note: '3.27:1 — control outlines' },
+    ],
+  },
+];
+
+const typeScale = [
+  { cls: 't-display', token: '--text-display', label: 'Display', range: '36 → 68px' },
+  { cls: 't-h1', token: '--text-h1', label: 'H1', range: '32 → 52px' },
+  { cls: 't-h2', token: '--text-h2', label: 'H2', range: '24 → 36px' },
+  { cls: 't-h3', token: '--text-h3', label: 'H3', range: '20 → 26px' },
+  { cls: 't-h4', token: '--text-h4', label: 'H4', range: '17 → 20px' },
+  { cls: 't-body-lg', token: '--text-body-lg', label: 'Body large', range: '17 → 19px' },
+  { cls: 't-body', token: '--text-body', label: 'Body', range: '16 → 17px' },
+  { cls: 't-body-sm', token: '--text-body-sm', label: 'Body small', range: '14 → 15px' },
+  { cls: 't-meta', token: '--text-meta', label: 'Metadata', range: '14px' },
+];
+
+/* Placeholder specimen copy. Deliberately varied in length to test wrapping. */
+const specimens = [
+  {
+    title: 'A deliberately long specimen headline that wraps onto three lines to test balance',
+    eyebrow: 'Small kitchen',
+    excerpt: 'Placeholder excerpt text used to check how a two-line summary sits under a long title.',
+    readingTimeMinutes: 8,
+  },
+  {
+    title: 'Short specimen title',
+    eyebrow: 'Closet',
+    excerpt: 'Placeholder excerpt.',
+    readingTimeMinutes: 4,
+  },
+  {
+    title: 'A medium-length specimen headline for comparison',
+    eyebrow: 'Entryway',
+    excerpt: 'Placeholder excerpt text that runs a little longer to check alignment across a row of cards.',
+    readingTimeMinutes: 6,
+  },
+];
+
+const ratios = ['landscape', 'editorial', 'portrait', 'pin', 'square'] as const;
+---
+
+<BaseLayout
+  title="Design system reference"
+  description="Development-only reference page for the SpaceWise Living design system."
+  bare
+  noindex
+>
+  <Section space="sm">
+    <Container width="content">
+      <Eyebrow marked tone="accent">Development only</Eyebrow>
+      <h1 class="t-h1" style="margin-block-start: var(--space-2xs)">
+        SpaceWise Living design system
+      </h1>
+      <p class="t-deck" style="margin-block-start: var(--space-sm)">
+        A reference surface for verifying tokens and components. This page is
+        generated in development only and is never emitted into the production
+        build.
+      </p>
+      <div class="callout callout--neutral" style="margin-block-start: var(--space-md); max-width: var(--width-article)">
+        <span class="callout__label">Placeholder content</span>
+        <p class="callout__body">
+          Every headline, excerpt, label and image slot below is placeholder
+          material chosen to stress-test the design. None of it is approved copy,
+          and no product, price, rating or business detail appears anywhere on
+          this page.
+        </p>
+      </div>
+    </Container>
+  </Section>
+
+  <Divider />
+
+  {/* ===================== COLOUR ===================== */}
+  <Section>
+    <Container width="content">
+      <div class="section__header">
+        <Eyebrow>01</Eyebrow>
+        <h2 class="t-h2">Colour</h2>
+        <p class="t-deck">
+          Warm, natural and calm. Ratios shown were computed from the token
+          values, not estimated.
+        </p>
+      </div>
+
+      {colorGroups.map((group) => (
+        <div style="margin-block-end: var(--space-xl)">
+          <h3 class="t-h4" style="margin-block-end: var(--space-sm)">{group.name}</h3>
+          <div class="grid grid--compact">
+            {group.swatches.map((s) => (
+              <div class="ds-swatch">
+                <div class="ds-swatch__chip" style={`background-color: ${s.hex}`}></div>
+                <div>
+                  <p class="ds-swatch__label">{s.label}</p>
+                  <p class="ds-swatch__token">{s.token}</p>
+                  <p class="ds-swatch__note">{s.hex} · {s.note}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </Container>
+  </Section>
+
+  {/* ===================== TYPOGRAPHY ===================== */}
+  <Section tone="alt">
+    <Container width="content">
+      <div class="section__header">
+        <Eyebrow>02</Eyebrow>
+        <h2 class="t-h2">Typography</h2>
+        <p class="t-deck">
+          Fraunces (editorial serif) carries the publication's voice. Figtree
+          (interface sans) carries everything that helps the reader navigate and
+          read. Resize the window to see the fluid scale.
+        </p>
+      </div>
+
+      {typeScale.map((t) => (
+        <div class="ds-type-row">
+          <div class="ds-type-row__meta">
+            <p class="t-meta">{t.label}</p>
+            <p class="ds-swatch__token">{t.token}</p>
+            <p class="t-meta">{t.range}</p>
+          </div>
+          <p class={t.cls}>Smart storage for small spaces</p>
+        </div>
+      ))}
+
+      <Divider />
+
+      <div class="grid grid--split">
+        <div>
+          <h3 class="t-h4" style="margin-block-end: var(--space-xs)">Eyebrows and labels</h3>
+          <div class="flow">
+            <Eyebrow>Organization</Eyebrow>
+            <Eyebrow tone="accent">Editor's pick</Eyebrow>
+            <Eyebrow marked tone="accent">Popular now</Eyebrow>
+          </div>
+        </div>
+        <div>
+          <h3 class="t-h4" style="margin-block-end: var(--space-xs)">Tags — used sparingly</h3>
+          <div class="cluster cluster--tight">
+            {categories.slice(0, 4).map((c) => (
+              <a class="tag" href={`/${c.slug}/`}>{c.name}</a>
+            ))}
+            <span class="tag tag--accent">Accent</span>
+          </div>
+          <p class="t-meta" style="margin-block-start: var(--space-sm)">
+            Where a tag adds no meaning, use a plain text link instead.
+          </p>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  {/* ===================== BUTTONS ===================== */}
+  <Section>
+    <Container width="content">
+      <div class="section__header">
+        <Eyebrow>03</Eyebrow>
+        <h2 class="t-h2">Buttons</h2>
+        <p class="t-deck">
+          Three levels. Every state is carried by more than colour — background,
+          border, underline, or a 1px press offset. Tab through them to check the
+          focus ring.
+        </p>
+      </div>
+
+      <div class="ds-grid-labelled">
+        <div>
+          <p class="t-meta">Primary</p>
+          <div class="cluster">
+            <Button variant="primary">Explore ideas</Button>
+            <Button variant="primary" size="sm">Small</Button>
+            <Button variant="primary" size="lg">Large</Button>
+            <Button variant="primary" disabled>Disabled</Button>
+          </div>
+        </div>
+        <div>
+          <p class="t-meta">Secondary</p>
+          <div class="cluster">
+            <Button variant="secondary">Read article</Button>
+            <Button variant="secondary" arrow>With arrow</Button>
+            <Button variant="secondary" size="sm">Small</Button>
+            <Button variant="secondary" disabled>Disabled</Button>
+          </div>
+        </div>
+        <div>
+          <p class="t-meta">Text</p>
+          <div class="cluster">
+            <Button variant="text" href="#">View all ideas</Button>
+            <Button variant="text" href="#" arrow>With arrow</Button>
+          </div>
+        </div>
+        <div>
+          <p class="t-meta">On an alternate surface</p>
+          <div class="cluster" style="background-color: var(--color-surface-alt); padding: var(--space-md); border-radius: var(--radius-md)">
+            <Button variant="primary">Primary</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="text" href="#" arrow>Text</Button>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  {/* ===================== CARDS ===================== */}
+  <Section tone="alt">
+    <Container width="content">
+      <div class="section__header">
+        <Eyebrow>04</Eyebrow>
+        <h2 class="t-h2">Cards</h2>
+        <p class="t-deck">
+          Image-led editorial containers, not app panels. Four densities share
+          one language so a page can have rhythm instead of repetition.
+        </p>
+      </div>
+
+      <p class="t-meta" style="margin-block-end: var(--space-sm)">Featured</p>
+      <ArticleCard
+        variant="featured"
+        boxed
+        title="A featured specimen headline long enough to show how the lead story wraps"
+        href="#"
+        eyebrow="Small spaces"
+        excerpt="Placeholder excerpt for the featured card. The image takes more room than the text — the asymmetry is deliberate."
+        readingTimeMinutes={9}
+      />
+
+      <Divider />
+
+      <p class="t-meta" style="margin-block-end: var(--space-sm)">Standard — 1 / 2 / 3 columns</p>
+      <div class="grid grid--cards">
+        {specimens.map((s) => (
+          <ArticleCard
+            boxed
+            title={s.title}
+            href="#"
+            eyebrow={s.eyebrow}
+            excerpt={s.excerpt}
+            readingTimeMinutes={s.readingTimeMinutes}
+          />
+        ))}
+      </div>
+
+      <Divider />
+
+      <div class="grid grid--split">
+        <div>
+          <p class="t-meta" style="margin-block-end: var(--space-sm)">Compact — related lists</p>
+          <div class="flow">
+            {specimens.map((s) => (
+              <ArticleCard variant="compact" title={s.title} href="#" />
+            ))}
+          </div>
+        </div>
+        <div>
+          <p class="t-meta" style="margin-block-end: var(--space-sm)">Category cards</p>
+          <div class="grid grid--categories" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
+            {categories.slice(0, 6).map((c) => (
+              <CategoryCard name={c.name} href={`/${c.slug}/`} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  {/* ===================== IMAGES ===================== */}
+  <Section>
+    <Container width="content">
+      <div class="section__header">
+        <Eyebrow>05</Eyebrow>
+        <h2 class="t-h2">Image ratios</h2>
+        <p class="t-deck">
+          The content type picks the crop. Every frame reserves its space before
+          the image loads, so there is no layout shift. No photography has been
+          supplied, so these render the honest placeholder state.
+        </p>
+      </div>
+
+      <div class="grid grid--cards" style="grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr))">
+        {ratios.map((r) => (
+          <div>
+            <ImageFrame ratio={r} label="Placeholder" />
+            <p class="t-meta" style="margin-block-start: var(--space-2xs)">{r}</p>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </Section>
+
+  {/* ===================== ARTICLE LANGUAGE ===================== */}
+  <Section tone="alt">
+    <Container width="content">
+      <div class="section__header">
+        <Eyebrow>06</Eyebrow>
+        <h2 class="t-h2">Article visual language</h2>
+        <p class="t-deck">
+          The article page is not built yet. These are the reusable pieces that
+          step will assemble, shown at the real article reading width.
+        </p>
+      </div>
+    </Container>
+
+    <Container width="article">
+      <div class="article-header">
+        <a class="article-header__category eyebrow eyebrow--accent" href="#">Small kitchen</a>
+        <h2 class="article-header__title">
+          A specimen article title that runs long enough to wrap across lines
+        </h2>
+        <p class="article-header__deck">
+          A placeholder deck that restates what the reader was promised, so a
+          visitor arriving from a Pin can confirm instantly they are in the right
+          place.
+        </p>
+        <MetadataRow
+          class="article-header__meta"
+          date="2026-10-05"
+          dateLabel="October 5, 2026"
+          readingTimeMinutes={7}
+        />
+      </div>
+
+      <div style="margin-block-start: var(--space-lg)">
+        <ImageFrame ratio="editorial" label="Article hero" />
+      </div>
+
+      <div class="prose" style="margin-block-start: var(--space-lg)">
+        <p>
+          Placeholder body copy set at the article reading width to check line
+          length and rhythm. The reading column is deliberately much narrower
+          than the content grid, which is what makes reading feel different from
+          browsing. Body copy sits at a 1.7 line height with a comfortable
+          measure of roughly 70 characters.
+        </p>
+        <h2>A section heading in the editorial serif</h2>
+        <p>
+          Below H2 the structure switches to the sans, because the job changes
+          from carrying the publication's voice to helping the reader scan. Here
+          is <a href="#">a link inside prose</a>, underlined so colour is never
+          the only signal.
+        </p>
+        <ul>
+          <li>A list item in the article body</li>
+          <li>A second item, slightly longer, to check wrapping behaviour</li>
+        </ul>
+        <blockquote>
+          A pull quote set in the editorial serif, used sparingly for emphasis.
+        </blockquote>
+      </div>
+
+      <div class="idea">
+        <span class="idea__number">01</span>
+        <h3 class="idea__title">A numbered idea, the backbone of list articles</h3>
+        <div class="idea__body">
+          <p class="t-body">
+            Placeholder explanation. The number is a visible editorial device set
+            in the serif, sitting beside the heading rather than inside the text
+            flow, and body copy aligns under the title rather than the number.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-block-start: var(--space-lg)">
+        <span class="callout__label">Tip</span>
+        <p class="callout__body">
+          A quiet aside. It should feel like a margin note in a well-made
+          magazine, not an alert box.
+        </p>
+      </div>
+
+      <div style="margin-block-start: var(--space-lg)">
+        <ProductRecommendation
+          problem="Wasted vertical space above a short cabinet"
+          name="Placeholder product name"
+          explanation="Placeholder explanation of why this helps in a small space. No price, rating, review count or availability appears here — the component has no fields for them."
+          href="#"
+          linkLabel="View product"
+          disclosure="Placeholder disclosure line. No affiliate program is approved yet."
+        />
+      </div>
+
+      <div class="faq" style="margin-block-start: var(--space-xl)">
+        <details class="faq__item">
+          <summary class="faq__question">A specimen question readers might ask</summary>
+          <p class="faq__answer">
+            A placeholder answer. Built on native details and summary, so it is
+            keyboard accessible and works with no JavaScript.
+          </p>
+        </details>
+        <details class="faq__item">
+          <summary class="faq__question">A second, noticeably longer specimen question to check wrapping</summary>
+          <p class="faq__answer">A placeholder answer.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3 class="related__title">Related ideas</h3>
+        <div class="flow">
+          {specimens.slice(0, 2).map((s) => (
+            <ArticleCard variant="compact" title={s.title} href="#" />
+          ))}
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  {/* ===================== CTA BLOCKS ===================== */}
+  <Section>
+    <Container width="content">
+      <div class="section__header">
+        <Eyebrow>07</Eyebrow>
+        <h2 class="t-h2">CTA blocks</h2>
+        <p class="t-deck">
+          One panel pattern, three jobs. No integrations are wired up, so the
+          newsletter form is disabled rather than pretending to accept a signup.
+        </p>
+      </div>
+
+      <div class="grid grid--split">
+        <CtaBlock
+          eyebrow="Placeholder"
+          heading="A generic call to action"
+          body="Placeholder copy for a future digital product block. No product name, price, URL or launch status is assumed."
+          href="#"
+          actionLabel="Placeholder label"
+        />
+        <CtaBlock
+          variant="newsletter"
+          accent
+          eyebrow="Placeholder"
+          heading="Newsletter block"
+          body="Placeholder copy. The layout exists; the provider does not."
+          actionLabel="Subscribe"
+        />
+      </div>
+
+      <div style="margin-block-start: var(--grid-gap)">
+        <CtaBlock
+          variant="save"
+          inline
+          heading="Save this idea"
+          body="A lightweight save prompt using a generic bookmark glyph — no third-party brand mark is used."
+          href="#"
+          actionLabel="Save this idea"
+        />
+      </div>
+    </Container>
+  </Section>
+
+  {/* ===================== SPACING + WIDTHS ===================== */}
+  <Section tone="alt">
+    <Container width="content">
+      <div class="section__header">
+        <Eyebrow>08</Eyebrow>
+        <h2 class="t-h2">Spacing, widths and surfaces</h2>
+      </div>
+
+      <div class="grid grid--split">
+        <div>
+          <h3 class="t-h4" style="margin-block-end: var(--space-sm)">Content widths</h3>
+          {[
+            ['--width-max', '1280px', 'var(--width-max)'],
+            ['--width-wide', '1200px', 'var(--width-wide)'],
+            ['--width-content', '1160px', 'var(--width-content)'],
+            ['--width-article', '720px', 'var(--width-article)'],
+            ['--width-narrow', '576px', 'var(--width-narrow)'],
+          ].map(([token, px, value]) => (
+            <div class="ds-bar-row">
+              <span class="ds-swatch__token">{token}</span>
+              <span class="t-meta">{px}</span>
+              <div class="ds-bar" style={`width: min(100%, calc(${value} / 1280 * 100%))`}></div>
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <h3 class="t-h4" style="margin-block-end: var(--space-sm)">Radius and shadow</h3>
+          <div class="cluster">
+            {[
+              ['sm', 'var(--radius-sm)'],
+              ['md · cards', 'var(--radius-md)'],
+              ['button', 'var(--radius-button)'],
+              ['lg · panels', 'var(--radius-lg)'],
+            ].map(([label, value]) => (
+              <div style="text-align:center">
+                <div class="ds-radius" style={`border-radius: ${value}`}></div>
+                <p class="t-meta" style="margin-block-start: var(--space-3xs)">{label}</p>
+              </div>
+            ))}
+          </div>
+          <div class="cluster" style="margin-block-start: var(--space-lg)">
+            <div style="text-align:center">
+              <div class="ds-radius" style="box-shadow: var(--shadow-subtle); border-color: transparent"></div>
+              <p class="t-meta" style="margin-block-start: var(--space-3xs)">subtle</p>
+            </div>
+            <div style="text-align:center">
+              <div class="ds-radius" style="box-shadow: var(--shadow-raised); border-color: transparent"></div>
+              <p class="t-meta" style="margin-block-start: var(--space-3xs)">raised</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Divider />
+
+      <h3 class="t-h4" style="margin-block-end: var(--space-sm)">Footer groups</h3>
+      <div class="grid grid--compact">
+        <FooterGroup title="Categories" links={categories.slice(0, 4).map((c) => ({ href: `/${c.slug}/`, label: c.name }))} />
+        <FooterGroup title="Legal" links={legalNav} />
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>
+
+<style>
+  /* Styles for the reference page's own scaffolding only. These never ship:
+     this page is development-only. */
+  .ds-swatch {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: flex-start;
+  }
+
+  .ds-swatch__chip {
+    flex: none;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-strong);
+  }
+
+  .ds-swatch__label {
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .ds-swatch__token {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--text-meta);
+    color: var(--color-accent);
+  }
+
+  .ds-swatch__note {
+    font-size: var(--text-meta);
+    color: var(--color-text-muted);
+  }
+
+  .ds-type-row {
+    display: grid;
+    gap: var(--space-2xs);
+    padding-block: var(--space-md);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 48rem) {
+    .ds-type-row {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: baseline;
+    }
+  }
+
+  .ds-type-row__meta > * { margin: 0; }
+
+  .ds-grid-labelled {
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  .ds-grid-labelled > div > .t-meta {
+    margin-block-end: var(--space-xs);
+  }
+
+  .ds-bar-row {
+    display: grid;
+    grid-template-columns: 9rem 4.5rem minmax(0, 1fr);
+    gap: var(--space-xs);
+    align-items: center;
+    padding-block: var(--space-2xs);
+  }
+
+  .ds-bar {
+    height: 10px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-accent-border);
+  }
+
+  .ds-radius {
+    width: 4rem;
+    height: 4rem;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+  }
+</style>

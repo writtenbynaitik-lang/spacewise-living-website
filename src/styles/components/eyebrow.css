@@ -1,0 +1,114 @@
+/* =============================================================================
+   SpaceWise Living — EYEBROWS, LABELS AND TAGS
+
+   Eyebrow rule: it orients the reader, it never competes with the headline.
+   Always smaller, always lighter in weight presence, never larger than 13px.
+   ========================================================================== */
+
+@layer components {
+  .eyebrow {
+    display: inline-block;
+    font-family: var(--font-interface);
+    font-size: var(--text-eyebrow);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  /* Accent variant — a quiet natural cue. Use for one eyebrow per view, not
+     every one, or the accent stops meaning anything. */
+  .eyebrow--accent { color: var(--color-accent); }
+
+  .eyebrow--ink { color: var(--color-ink); }
+
+  /* Eyebrow preceded by a short rule, for feature sections. */
+  .eyebrow--marked {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+  }
+
+  .eyebrow--marked::before {
+    content: '';
+    width: var(--space-md);
+    height: 2px;
+    background-color: var(--color-accent);
+  }
+
+  /* ---------------------------------------------------------------------------
+     TAGS / CHIPS
+     Used sparingly and deliberately. Where a tag is not adding meaning, use a
+     plain text link instead — this site is a publication, not a dashboard.
+     The pill radius is the ONE place --radius-pill is allowed.
+     ------------------------------------------------------------------------ */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: var(--space-3xs) var(--space-xs);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-pill);
+    background-color: transparent;
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: border-color var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard),
+      background-color var(--duration-fast) var(--ease-standard);
+  }
+
+  a.tag:hover {
+    border-color: var(--color-ink);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  .tag--accent {
+    border-color: var(--color-accent-border);
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  /* ---------------------------------------------------------------------------
+     METADATA ROW — category · date · reading time
+     Separators are generated, so markup stays clean and a missing field never
+     leaves a dangling dot.
+     ------------------------------------------------------------------------ */
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-xs);
+    font-family: var(--font-interface);
+    font-size: var(--text-meta);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+  }
+
+  .meta > * + *::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    margin-inline-end: var(--space-xs);
+    border-radius: var(--radius-pill);
+    background-color: currentColor;
+    opacity: 0.5;
+    vertical-align: middle;
+  }
+
+  .meta a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .meta a:hover {
+    color: var(--color-ink);
+    text-decoration: underline;
+  }
+}

@@ -1,0 +1,167 @@
+---
+/**
+ * /privacy/ — Privacy Policy.
+ *
+ * EVERY CLAIM HERE WAS CHECKED AGAINST THE SOURCE. The project was searched for
+ * analytics, tag managers, pixels, ad scripts, cookies, localStorage,
+ * sessionStorage, IndexedDB, consent platforms, newsletter providers, accounts,
+ * payments, databases, third-party embeds and remote scripts or stylesheets.
+ * None exists; see `siteFacts` in `src/config/legal.ts` and the audit recorded
+ * in project-brief.md §13v.
+ *
+ * So this policy describes a site that genuinely does very little, rather than
+ * reciting the usual template. In particular it does NOT say "we collect your
+ * IP address", "we use cookies" or "we use Google Analytics", because none of
+ * those statements would be true today.
+ *
+ * It is also careful about the one real nuance: the search form puts the query
+ * in the URL, and a URL is part of the request sent to whatever service hosts
+ * the site. That is stated plainly instead of being glossed over.
+ *
+ * This is website copy, not legal advice, and no compliance claim is made.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LegalPage from '../components/page/LegalPage.astro';
+import { site } from '../config/site';
+---
+
+<BaseLayout
+  title="Privacy Policy"
+  description="What information is and is not handled when you visit SpaceWise Living."
+  bare
+>
+  <LegalPage
+    eyebrow="Legal / Privacy"
+    title="Privacy Policy"
+    intro="SpaceWise Living respects your privacy. This page explains what information may be handled when you visit this website and how it is used."
+    contactIntro="If you have a question about this policy, you can get in touch once a contact route is available."
+  >
+    <h2>Summary</h2>
+    <p>
+      {site.name} is a static content website. It has no accounts, no comments,
+      no newsletter, no shop and no database. It does not run analytics, does
+      not use advertising or tracking scripts, and does not set cookies of its
+      own. The sections below describe that in more detail.
+    </p>
+
+    <h2>Information you provide</h2>
+    <p>
+      This website does not currently ask you for any personal information.
+      There is no contact form, no account or login, no newsletter signup, no
+      comment system and no checkout, so there is no mechanism on this site
+      through which you can submit your name, email address or other personal
+      details.
+    </p>
+    <p>
+      A contact route for {site.name} has not been configured yet. If one is
+      added later — for example an email address — anything you choose to send
+      through it would reach whoever operates that channel, and this policy
+      would be updated to say so.
+    </p>
+
+    <h2>Information collected automatically</h2>
+    <p>
+      This site runs no analytics service, no tag manager, no advertising or
+      measurement pixel, and no third-party tracking script. It does not build a
+      profile of you, and it does not record what you read.
+    </p>
+    <p>
+      Two ordinary things still happen, because they are how the web works:
+    </p>
+    <ul>
+      <li>
+        <strong>Your browser requests pages from a server.</strong> Any web
+        host can keep standard request logs, which typically include details
+        such as an IP address and the page requested. {site.name} does not
+        operate or configure such logging, and no hosting provider has been set
+        up for this project yet.
+      </li>
+      <li>
+        <strong>Search terms appear in the page address.</strong> The search
+        page filters results in your browser, but submitting a search puts your
+        words into the URL — for example
+        {' '}<code>/search/?q=under+sink</code>. Like any address you visit,
+        that forms part of the request your browser makes to the host. This site
+        does not store, transmit or analyse your search terms anywhere else.
+      </li>
+    </ul>
+
+    <h2>Cookies and similar technologies</h2>
+    <p>
+      This website sets no cookies of its own. It does not use
+      <code>localStorage</code>, <code>sessionStorage</code> or any other
+      browser storage, and there is no consent banner because there is nothing
+      to consent to.
+    </p>
+    <p>
+      Websites you reach by following a link from here are separate and may use
+      cookies and similar technologies of their own, under their own policies.
+    </p>
+
+    <h2>Fonts and other assets</h2>
+    <p>
+      The typefaces, images, stylesheet and scripts used by this site are served
+      from this site itself. No font, script or stylesheet is loaded from a
+      third-party service, so visiting a page does not cause your browser to
+      contact another company.
+    </p>
+
+    <h2>How information is used</h2>
+    <p>
+      Because the site collects nothing itself, there is nothing for it to use,
+      share, sell or transfer. No personal information is processed for
+      advertising, profiling or any other purpose.
+    </p>
+
+    <h2>Third-party websites and links</h2>
+    <p>
+      {site.name} may link to other websites — for example retailers, makers or
+      reference material. Those sites are independently operated. Their content,
+      privacy practices and use of cookies are theirs, not ours, and this policy
+      does not apply once you leave this site. It is worth reading their own
+      policies.
+    </p>
+
+    <h2>Affiliate links</h2>
+    <p>
+      {site.name} is intended to support itself in part through affiliate links,
+      which means some future links may earn a commission when a purchase is
+      made through them. <strong>No affiliate programme has been set up and no
+      affiliate links are published on this site today.</strong> When that
+      changes, following such a link may allow the destination retailer to
+      record that you arrived from here, under that retailer's own policy. The
+      {' '}<a href="/affiliate-disclosure/">affiliate disclosure</a> explains the
+      arrangement in more detail.
+    </p>
+
+    <h2>Data retention</h2>
+    <p>
+      This site has no database, no user accounts and no server-side storage of
+      personal information, so there is no store of personal data to retain or
+      delete, and no retention period to state.
+    </p>
+
+    <h2>Your choices</h2>
+    <p>
+      There is no account to close, no mailing list to leave and no cookie
+      preference to set, because none of those exist here. Your browser's own
+      controls — private browsing, blocking scripts, clearing site data — work
+      on this site as they do anywhere else.
+    </p>
+
+    <h2>Children's privacy</h2>
+    <p>
+      This website is general-interest home organization content and is not
+      directed at children. It does not knowingly collect information from
+      anyone, including children.
+    </p>
+
+    <h2>Changes to this policy</h2>
+    <p>
+      This policy describes the website as it is currently built. It will be
+      updated if the site starts doing something new — for example adding
+      analytics, a newsletter or a contact form. The date at the top of this
+      page shows when the wording last changed.
+    </p>
+  </LegalPage>
+</BaseLayout>

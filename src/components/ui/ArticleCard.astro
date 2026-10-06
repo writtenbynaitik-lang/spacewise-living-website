@@ -1,0 +1,103 @@
+---
+/**
+ * ArticleCard - standard, featured and compact variants.
+ *
+ * One component, three densities, one design language. The variants exist so a
+ * page can have rhythm instead of reading as a wall of identical cards.
+ *
+ *   standard  image-led grid card (the default)
+ *   featured  large asymmetric image + text, for a lead story
+ *   compact   small thumbnail + title, for related lists and sidebars
+ *
+ * The whole card is clickable via a stretched link on the title, which keeps
+ * the title as the link's accessible name and avoids nested interactive
+ * elements. Focus is drawn around the whole card.
+ */
+import ImageFrame from './ImageFrame.astro';
+import Eyebrow from './Eyebrow.astro';
+import MetadataRow from './MetadataRow.astro';
+
+interface Props {
+  title: string;
+  href: string;
+  excerpt?: string;
+  /** Category or section label shown above the title. */
+  eyebrow?: string;
+  image?: { src?: string; alt?: string };
+  /** Overrides the variant's default crop. */
+  ratio?: 'landscape' | 'editorial' | 'portrait' | 'pin' | 'square';
+  variant?: 'standard' | 'featured' | 'compact';
+  /** Give the card a surface + border, for use on toned sections. */
+  boxed?: boolean;
+  date?: string;
+  dateLabel?: string;
+  readingTimeMinutes?: number;
+  class?: string;
+}
+
+const {
+  title,
+  href,
+  excerpt,
+  eyebrow,
+  image,
+  ratio,
+  variant = 'standard',
+  boxed = false,
+  date,
+  dateLabel,
+  readingTimeMinutes,
+  class: className,
+} = Astro.props;
+
+/** Each variant has a default crop that suits its proportions. */
+const defaultRatio = {
+  standard: 'landscape',
+  featured: 'editorial',
+  compact: 'square',
+} as const;
+
+const frameRatio = ratio ?? defaultRatio[variant];
+const hasMeta = Boolean(date || readingTimeMinutes);
+const isCompact = variant === 'compact';
+---
+
+<article
+  class:list={[
+    'card',
+    `card--${variant}`,
+    boxed && 'card--boxed',
+    className,
+  ]}
+>
+  <div class="card__media">
+    <ImageFrame
+      src={image?.src}
+      alt={image?.alt ?? ''}
+      ratio={frameRatio}
+      zoom={!isCompact}
+      label="Article image"
+    />
+  </div>
+
+  <div class="card__body">
+    {eyebrow && !isCompact && <Eyebrow>{eyebrow}</Eyebrow>}
+
+    <h3 class="card__title">
+      <a class="card__link" href={href}>{title}</a>
+    </h3>
+
+    {excerpt && !isCompact && <p class="card__excerpt">{excerpt}</p>}
+
+    {
+      hasMeta && (
+        <MetadataRow
+          class="card__meta"
+          date={date}
+          dateLabel={dateLabel}
+          readingTimeMinutes={readingTimeMinutes}
+        />
+      )
+    }
+  </div>
+</article>

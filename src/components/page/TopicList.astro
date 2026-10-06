@@ -1,0 +1,54 @@
+---
+/**
+ * TopicList — the problem areas a category covers.
+ *
+ * These are the reader's actual problems ("Under-Sink Storage"), not lifestyle
+ * abstractions, because the reader arrived from Pinterest with a specific
+ * annoyance in mind.
+ *
+ * LINKING RULE: a topic renders as a LINK only when `href` is set in
+ * `categories.ts`. No topic routes exist yet, so today every topic renders as
+ * plain text. That is deliberate — a link to a page that does not exist is
+ * worse than no link, and styling a non-link to look clickable is the same lie
+ * one step removed. When a topic gains a real destination, adding `href` to the
+ * config is the only change needed; this component already handles both.
+ */
+import Container from '../ui/Container.astro';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  intro?: string;
+  topics: { label: string; href?: string }[];
+}
+
+const { eyebrow = 'Explore topics', heading, intro, topics } = Astro.props;
+---
+
+<Section aria-labelledby="topics-heading">
+  <Container width="content">
+    <header class="section-head">
+      <Eyebrow class="section-head__eyebrow">{eyebrow}</Eyebrow>
+      <h2 class="t-h2 section-head__heading" id="topics-heading">{heading}</h2>
+      {intro && <p class="section-head__intro">{intro}</p>}
+    </header>
+
+    <ul class="topics">
+      {
+        topics.map((topic) => (
+          <li class="topics__item">
+            {topic.href ? (
+              <a class="topic topic--link" href={topic.href}>
+                {topic.label}
+              </a>
+            ) : (
+              <span class="topic">{topic.label}</span>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </Container>
+</Section>

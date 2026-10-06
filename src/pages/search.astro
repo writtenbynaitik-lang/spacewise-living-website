@@ -1,0 +1,260 @@
+---
+/**
+ * /search/ — site search.
+ *
+ * ARCHITECTURE. Every published article is rendered server-side as an ordinary
+ * ArticleCard inside a hidden list, each carrying its searchable fields in data
+ * attributes. A small inline script reads `?q=` and shows the matching items.
+ *
+ * Why this shape rather than building result markup in JavaScript:
+ *   - results are the same ArticleCard the rest of the site uses, so search
+ *     cannot drift away from the design system,
+ *   - there is no second copy of card markup to maintain,
+ *   - no index file is fetched, so search costs zero extra requests.
+ *
+ * It suits a site of this size. If the library ever grows to the point where
+ * shipping every card on this page is wasteful, the replacement is a generated
+ * JSON index — the markup and states here would not change.
+ *
+ * NO EXTERNAL SERVICE, NO DEPENDENCY, NO SERVER. The site is static; search is
+ * a filter over data that is already in the page.
+ *
+ * SUBMISSION is a real GET form to this same route, so the query lives in the
+ * URL and refresh, Back, Forward and sharing all work without any history
+ * handling of our own. Nothing searches on keystroke.
+ *
+ * CURRENT STATE: the article collection is empty, so `results` is `[]` and a
+ * query truthfully reports that there is nothing published to search yet. No
+ * placeholder articles exist, and none are invented here.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Section from '../components/ui/Section.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import Button from '../components/ui/Button.astro';
+import ArticleCard from '../components/ui/ArticleCard.astro';
+import { getPublishedArticles, toCardDataList } from '../lib/articles';
+import { getCategory } from '../config/categories';
+
+const articles = await getPublishedArticles();
+const cards = await toCardDataList(articles);
+
+/**
+ * Searchable fields, exactly the four the brief names: title, excerpt,
+ * category and tags. Nothing else about an article is exposed, and no source
+ * file or implementation detail is searchable.
+ */
+const results = articles.map((article, i) => {
+  const category = getCategory(article.data.category);
+  return {
+    card: cards[i],
+    title: article.data.title.toLowerCase(),
+    excerpt: article.data.excerpt.toLowerCase(),
+    category: `${category?.name ?? ''} ${article.data.category}`.toLowerCase().trim(),
+    tags: (article.data.tags ?? []).join(' ').toLowerCase(),
+  };
+});
+
+const hasArticles = results.length > 0;
+
+/**
+ * Example topics for the no-query state. They are illustrative text, NOT
+ * links and NOT results — nothing here implies an article exists.
+ */
+const examples = [
+  'small kitchen storage',
+  'under-sink organization',
+  'closet storage',
+  'bedroom organization',
+  'small bathroom ideas',
+];
+---
+
+<BaseLayout
+  title="Search"
+  description="Search SpaceWise Living for practical organization ideas, storage solutions, and small-space inspiration."
+  bare
+  noindex
+>
+  <Section space="lg" flushBottom>
+    <Container width="content">
+      <div class="search__head">
+        <Eyebrow class="search__eyebrow" marked>SpaceWise search</Eyebrow>
+        <h1 class="t-h1 search__title">Search SpaceWise Living</h1>
+        <p class="t-deck search__deck">
+          Find practical organization ideas, storage solutions, and inspiration
+          for small spaces.
+        </p>
+      </div>
+
+      {/*
+        A real GET form to this same route. Submitting puts the query in the
+        URL, which is what makes refresh, Back/Forward and sharing work.
+      */}
+      <form class="search__form" role="search" action="/search/" method="get">
+        {/* A real <label>, not a placeholder standing in for one. */}
+        <label class="search__label" for="search-q">Search articles and ideas</label>
+        <div class="search__field">
+          <input
+            class="search__input"
+            type="search"
+            id="search-q"
+            name="q"
+            autocomplete="off"
+            enterkeyhint="search"
+            placeholder="Try: under-sink storage"
+          />
+          <Button type="submit" variant="primary">Search</Button>
+        </div>
+      </form>
+
+      {/* Announced once per submission, never per keystroke. */}
+      <p class="search__status" id="search-status" role="status" hidden></p>
+
+      <noscript>
+        <p class="search__noscript">
+          Search needs JavaScript. You can still browse everything by room from
+          the menu, or see <a href="/articles/">all articles</a>.
+        </p>
+      </noscript>
+
+      {/* --- No query yet -------------------------------------------------- */}
+      <div class="search__hint" id="search-hint">
+        <p class="search__hint-lead">Search practical ideas for your space.</p>
+        <p class="search__hint-body">
+          Search covers article titles, summaries, rooms and topics. Things
+          people look for:
+        </p>
+        <ul class="search__examples">
+          {examples.map((e) => <li>{e}</li>)}
+        </ul>
+      </div>
+
+      {/* --- Query, but the library is empty -------------------------------- */}
+      <div class="empty-state search__state" id="search-none-published" hidden>
+        <p class="empty-state__message">
+          SpaceWise Living doesn't have published articles to search yet. New
+          organization guides will appear here as they're published.
+        </p>
+      </div>
+
+      {/* --- Query, articles exist, nothing matched -------------------------- */}
+      <div class="empty-state search__state" id="search-no-match" hidden>
+        <p class="empty-state__message">
+          No published articles match this search yet. Try a different word, or
+          browse by room from the menu.
+        </p>
+      </div>
+
+      {/* --- Results --------------------------------------------------------
+           Rendered server-side and revealed by the script. Hidden by default so
+           that with scripting unavailable no unfiltered list is ever presented
+           as if it were a result set. */}
+      <ul class="article-grid search__results" id="search-results" hidden>
+        {
+          results.map((r) => (
+            <li
+              class="search__result"
+              data-title={r.title}
+              data-excerpt={r.excerpt}
+              data-category={r.category}
+              data-tags={r.tags}
+              hidden
+            >
+              <ArticleCard
+                title={r.card.title}
+                href={r.card.href}
+                excerpt={r.card.excerpt}
+                eyebrow={r.card.eyebrow}
+                image={r.card.image}
+                date={r.card.date}
+                dateLabel={r.card.dateLabel}
+                readingTimeMinutes={r.card.readingTimeMinutes}
+              />
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="search__reset" id="search-reset" hidden>
+        <a href="/search/">Clear search</a>
+      </p>
+    </Container>
+  </Section>
+</BaseLayout>
+
+<script is:inline define:vars={{ hasArticles }}>
+  /**
+   * Reads ?q= and shows the right state. No keystroke handler, no network
+   * request, no history manipulation — the form navigation does all of that.
+   */
+  (function () {
+    var input = document.getElementById('search-q');
+    var list = document.getElementById('search-results');
+    var hint = document.getElementById('search-hint');
+    var nonePublished = document.getElementById('search-none-published');
+    var noMatch = document.getElementById('search-no-match');
+    var status = document.getElementById('search-status');
+    var reset = document.getElementById('search-reset');
+    if (!input || !list) return;
+
+    var q = (new URLSearchParams(window.location.search).get('q') || '').trim();
+    input.value = q;
+
+    function show(el, on) {
+      if (el) el.hidden = !on;
+    }
+
+    if (!q) {
+      show(hint, true);
+      return;
+    }
+
+    show(hint, false);
+    show(reset, true);
+
+    var needle = q.toLowerCase();
+
+    /* Deliberately simple, deterministic ranking — title beats taxonomy beats
+       excerpt. No fuzzy matching, no weighting to tune. */
+    var items = Array.prototype.slice.call(list.querySelectorAll('.search__result'));
+    var matched = [];
+    items.forEach(function (li) {
+      var title = li.getAttribute('data-title') || '';
+      var category = li.getAttribute('data-category') || '';
+      var tags = li.getAttribute('data-tags') || '';
+      var excerpt = li.getAttribute('data-excerpt') || '';
+      var score = 0;
+      if (title === needle) score = 4;
+      else if (title.indexOf(needle) !== -1) score = 3;
+      else if (category.indexOf(needle) !== -1 || tags.indexOf(needle) !== -1) score = 2;
+      else if (excerpt.indexOf(needle) !== -1) score = 1;
+      if (score > 0) matched.push({ li: li, score: score });
+    });
+
+    matched.sort(function (a, b) {
+      return b.score - a.score;
+    });
+    matched.forEach(function (m) {
+      m.li.hidden = false;
+      list.appendChild(m.li); // reorder by score; already date-sorted within a score
+    });
+
+    if (matched.length > 0) {
+      show(list, true);
+      status.textContent =
+        matched.length + (matched.length === 1 ? ' result for ' : ' results for ') + '“' + q + '”';
+      show(status, true);
+      return;
+    }
+
+    /* Two different truths: nothing is published at all, versus nothing
+       matched. Saying "no matches" while the library is empty would imply a
+       library exists. */
+    show(hasArticles ? noMatch : nonePublished, true);
+    status.textContent = hasArticles
+      ? 'No results for “' + q + '”'
+      : 'No published articles to search yet';
+    show(status, true);
+  })();
+</script>

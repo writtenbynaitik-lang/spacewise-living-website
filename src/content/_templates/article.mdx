@@ -1,0 +1,125 @@
+---
+# ============================================================================
+# SpaceWise Living - ARTICLE AUTHORING TEMPLATE
+#
+# This file lives OUTSIDE src/content/articles/, so it is not part of the
+# content collection and never builds into a page.
+#
+# TO PUBLISH AN ARTICLE:
+#   1. Copy this file to src/content/articles/<your-article-slug>.mdx
+#      The filename becomes the URL: /articles/<your-article-slug>/
+#   2. Fill in the frontmatter below. Required fields are marked REQUIRED.
+#   3. Delete every optional field you are not using, and delete these comments.
+#   4. Write the body below the closing --- as normal Markdown.
+#   5. Run `npm run dev` and open /articles/<your-article-slug>/
+#
+# The schema in src/content.config.ts validates this file at build time. A typo
+# or a missing required field fails the build with an exact message instead of
+# publishing a broken page.
+# ============================================================================
+
+# REQUIRED. The article headline.
+title: Example Article Title
+
+# OPTIONAL. Only set this to change the URL without renaming the file.
+# slug: custom-url-slug
+
+# REQUIRED. One- or two-sentence summary. Used on listing pages and as the
+# fallback meta description.
+excerpt: One or two sentences summarising what the reader will get from this article.
+
+# REQUIRED. Must be one of the slugs in src/config/categories.ts:
+#   kitchen | bedroom | bathroom | closet | living-room | entryway |
+#   home-office | small-spaces
+category: small-spaces
+
+# OPTIONAL. Free-form topic tags.
+tags:
+  - example
+
+# OPTIONAL. Omit to fall back to site.defaultAuthor (currently UNRESOLVED).
+# author: Author Name
+
+# REQUIRED. Publication date, YYYY-MM-DD.
+publishedDate: 2026-01-01
+
+# OPTIONAL. Set when meaningfully revising an existing article.
+# updatedDate: 2026-02-01
+
+# OPTIONAL. Reading time in whole minutes. Automatic calculation is planned.
+# readingTimeMinutes: 7
+
+# OPTIONAL. Main in-page image. Paths are relative to THIS file; put the image
+# in src/assets/articles/ and reference it with ../../assets/articles/...
+# Astro optimizes it and derives width/height automatically.
+# `alt` is required for accessibility.
+# heroImage:
+#   src: ../../assets/articles/example.jpg
+#   alt: Describe what is visible in the image.
+#   caption: Optional caption or credit.
+
+# OPTIONAL. Tall, Pinterest-optimized version of the image (vertical crop).
+# Kept separate from heroImage because Pinterest needs different proportions.
+# pinterestImage:
+#   src: ../../assets/pinterest/example-pin.jpg
+#   alt: Describe what is visible in the Pin image.
+
+# OPTIONAL. Override the <title> and meta description for search.
+# seoTitle: Search-optimised title
+# seoDescription: Search-optimised description under about 155 characters.
+
+# OPTIONAL. Affiliate recommendations.
+#
+# RULES: only add an entry when you have the real product in front of you and a
+# real affiliate URL. Never write a price, rating, review count, discount,
+# availability or specification - the schema has no fields for them precisely so
+# they cannot be guessed. `whyItHelps` must explain the organization problem the
+# product solves, so the recommendation stays secondary to the article.
+# `placement` points at a heading in the body so the recommendation appears in
+# context instead of in a list at the end.
+# affiliate:
+#   - name: Exact verified product name
+#     url: https://example.com/real-affiliate-url
+#     retailer: Retailer name
+#     whyItHelps: What organization problem this solves and why it fits a small space.
+#     placement: matching-body-heading-slug
+
+# OPTIONAL. FAQ block, rendered by the shared article template.
+# faq:
+#   - question: A real question readers ask about this topic.
+#     answer: A direct, useful answer.
+
+# OPTIONAL. End-of-article call to action. Omit `href` until a real destination
+# exists - there is no purchase or signup functionality.
+# cta:
+#   heading: Short CTA heading
+#   body: One or two sentences.
+#   href: https://example.com/real-destination
+#   linkLabel: Button text
+
+# OPTIONAL. Slugs of related articles (the filename without .mdx).
+# Note: a slug that matches no file is not currently caught at build time -
+# double-check these until the article-page step adds that assertion.
+# relatedArticles:
+#   - some-other-article-slug
+
+# OPTIONAL. `true` keeps the article visible in `npm run dev` but excluded from
+# production builds. Useful for work in progress.
+draft: true
+---
+
+Write the article body here as normal Markdown.
+
+## Use H2 headings for each main section
+
+Pinterest visitors arrive expecting the specific thing the Pin promised, so the
+opening lines should confirm they are in the right place before anything else.
+Keep sections short and scannable.
+
+### H3 for sub-points within a section
+
+Structure each idea as: the problem, why it happens in small spaces, then the
+practical solution. Add a product recommendation only where it genuinely helps.
+
+Inline images go in the body with standard Markdown or the Astro `<Image />`
+component once the image components are built in a later step.

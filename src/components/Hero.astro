@@ -1,0 +1,223 @@
+---
+/**
+ * SpaceWise Living - homepage hero.
+ *
+ * Carries the page's single <h1>. An editorial two-part composition: content
+ * column + dominant media area, stacking content-first below 1120px.
+ *
+ * MEDIA IS STRUCTURAL IN STEP 4. No hero photograph has been supplied, so the
+ * media area renders a clearly-unfinished development placeholder. Passing a
+ * `media` prop in Step 5 switches it to a real <picture> with no layout change:
+ * the box, its ratio, the crop behaviour and the focal-point hook already exist.
+ *
+ * Copy is passed in by the page rather than hard-coded here, so the approved
+ * wording stays visible at the point it is used.
+ */
+import { getImage } from 'astro:assets';
+import Eyebrow from './ui/Eyebrow.astro';
+import Button from './ui/Button.astro';
+import type { HeroMedia } from '../config/hero-media';
+
+interface HeroCta {
+  href: string;
+  label: string;
+}
+
+interface Props {
+  /** Small editorial label above the heading. */
+  eyebrow: string;
+  /** The page's H1. */
+  heading: string;
+  /** Supporting paragraph beneath the heading. */
+  body: string;
+  primaryCta: HeroCta;
+  secondaryCta?: HeroCta;
+  /**
+   * The hero photograph. Supplied from `src/config/hero-media.ts`, which is
+   * `null` until an approved asset exists - in which case the media area
+   * renders its placeholder surface instead. See that file for the shape.
+   */
+  media?: HeroMedia | null;
+}
+
+const { eyebrow, heading, body, primaryCta, secondaryCta, media } = Astro.props;
+
+/* ---------------------------------------------------------------------------
+   RESPONSIVE IMAGE PIPELINE
+
+   Candidate widths are matched to what the media box actually renders at,
+   measured in Step 4:
+     < 64rem   full container width - 280px at 320px, ~694px at 768px
+     64-70rem  about half the container - ~435-470px
+     >= 70rem  56% of a 1160px container - 614px, so 620px plus a 2x option
+
+   `sizes` mirrors those breakpoints so the browser picks the smallest file
+   that still covers the box, rather than sending a desktop-sized image to a
+   phone. Widths wider than the source are dropped: upscaling costs bytes and
+   adds nothing.
+   ------------------------------------------------------------------------ */
+const HERO_WIDTHS = [320, 440, 620, 880, 1240];
+const HERO_SIZES = '(min-width: 70rem) 620px, (min-width: 64rem) 46vw, 92vw';
+
+/** Build one format's srcset for a given source image. */
+async function buildSources(source: ImageMetadata) {
+  const widths = HERO_WIDTHS.filter((w) => w <= source.width);
+  if (widths.length === 0) widths.push(source.width);
+
+  const [avif, webp, fallback, defaultSrc] = await Promise.all([
+    getImage({ src: source, widths, format: 'avif', quality: 72 }),
+    getImage({ src: source, widths, format: 'webp', quality: 78 }),
+    getImage({ src: source, widths, format: 'jpeg', quality: 82 }),
+    /*
+      A dedicated mid-size file for the <img src> attribute.
+
+      `getImage({ widths })` returns a srcset plus a `src` that points at the
+      FULL-SIZE original - 1672px and ~304 KB for this photograph. Measured: the
+      browser fetched that alongside the 620w AVIF it actually displayed, so the
+      page pulled the hero down twice. Pointing `src` at a mid-size variant
+      removes the waste; the srcset still governs what is really used, and this
+      only matters for clients that ignore <source>.
+    */
+    getImage({
+      src: source,
+      width: Math.min(620, source.width),
+      format: 'jpeg',
+      quality: 82,
+    }),
+  ]);
+  return { avif, webp, fallback, defaultSrc };
+}
+
+const desktop = media ? await buildSources(media.src) : null;
+const mobile = media?.srcMobile ? await buildSources(media.srcMobile) : null;
+
+/** Focal point drives `object-position`, so a crop never loses the subject. */
+function focalVars(point: string | undefined, prefix: string) {
+  const [x = '50%', y = '50%'] = (point ?? '').split(/\s+/).filter(Boolean);
+  return `${prefix}-x: ${x}; ${prefix}-y: ${y};`;
+}
+
+const mediaStyle = media
+  ? [
+      focalVars(media.focalPoint, '--hero-focal'),
+      focalVars(media.focalPointMobile ?? media.focalPoint, '--hero-focal-mobile'),
+    ].join(' ')
+  : undefined;
+---
+
+<section class="hero" id="hero" aria-labelledby="hero-heading">
+  <div class="container container--content hero__inner">
+    <div class="hero__content">
+      {/*
+        Written in sentence case in the markup and uppercased by the design
+        system's .eyebrow style. Screen readers announce the DOM text, so this
+        avoids letter-by-letter spelling of an all-caps string.
+      */}
+      <Eyebrow class="hero__eyebrow" tone="accent" marked>{eyebrow}</Eyebrow>
+
+      <h1 class="hero__heading" id="hero-heading">{heading}</h1>
+
+      <p class="hero__body">{body}</p>
+
+      <div class="hero__actions">
+        {/*
+          Real links, not buttons: these navigate.
+
+          Standard size rather than `lg`. Measured: `lg` padding makes the pair
+          429px wide, which does not fit the 417px content column at 1024px, so
+          the two actions wrapped onto separate lines at mismatched widths.
+          The standard size still gives a 44px touch target, and the primary
+          action stays dominant through the design system's own hierarchy -
+          a solid sage fill against an outline.
+        */}
+        <Button variant="primary" href={primaryCta.href}>
+          {primaryCta.label}
+        </Button>
+        {
+          secondaryCta && (
+            <Button variant="secondary" href={secondaryCta.href}>
+              {secondaryCta.label}
+            </Button>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="hero__media-wrap">
+      {
+        media && desktop ? (
+          <div class="frame hero__media" style={mediaStyle}>
+            <picture>
+              {/*
+                Art-directed mobile variant first, when one has been supplied.
+                Below 64rem the frame is a 3:2 landscape box rather than the
+                5:4 desktop crop, so a different source can suit it better.
+              */}
+              {mobile && (
+                <>
+                  <source
+                    media="(max-width: 63.99rem)"
+                    type="image/avif"
+                    srcset={mobile.avif.srcSet.attribute}
+                    sizes={HERO_SIZES}
+                  />
+                  <source
+                    media="(max-width: 63.99rem)"
+                    type="image/webp"
+                    srcset={mobile.webp.srcSet.attribute}
+                    sizes={HERO_SIZES}
+                  />
+                </>
+              )}
+
+              {/* Modern formats first; the browser takes the first it supports. */}
+              <source type="image/avif" srcset={desktop.avif.srcSet.attribute} sizes={HERO_SIZES} />
+              <source type="image/webp" srcset={desktop.webp.srcSet.attribute} sizes={HERO_SIZES} />
+
+              {/*
+                The hero image is the largest above-the-fold visual, so it is
+                eager and high priority - never lazy-loaded, which would delay
+                the main paint. `width`/`height` come from the real file, so the
+                box is reserved before a single byte arrives and nothing shifts.
+
+                `onerror` is a plain attribute, not a script: it adds no
+                JavaScript to the bundle. It flags the frame so CSS can hide the
+                failed image and leave the warm neutral surface in its place,
+                instead of a broken-image icon. The visible loading and failure
+                treatment is a later step; this is only the underlying
+                behaviour that keeps a missing image from damaging the hero.
+              */}
+              <img
+                src={desktop.defaultSrc.src}
+                srcset={desktop.fallback.srcSet.attribute}
+                sizes={HERO_SIZES}
+                alt={media.alt}
+                width={media.src.width}
+                height={media.src.height}
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                onerror="this.closest('.frame')?.setAttribute('data-media-failed','true')"
+              />
+            </picture>
+          </div>
+        ) : (
+          /*
+            No hero photograph has been supplied yet, so the media area renders
+            as a quiet warm panel - the same neutral surface the failure state
+            falls back to. It carries no label or note: build-process text is
+            not public website content, and an empty surface reads as
+            intentional where a dashed "placeholder" box reads as unfinished.
+
+            aria-hidden because it conveys nothing a reader needs - the heading,
+            paragraph and both actions already carry the hero in full.
+
+            The missing asset is tracked in src/config/hero-media.ts and in
+            project-brief.md, not on the page.
+          */
+          <div class="frame hero__media hero__media--empty" aria-hidden="true" />
+        )
+      }
+    </div>
+  </div>
+</section>

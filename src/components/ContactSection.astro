@@ -1,0 +1,49 @@
+---
+/**
+ * SpaceWise Living - closing contact section (#contact).
+ *
+ * A calm closing invitation that points at the real /contact/ route.
+ *
+ * NO FORM, and nothing that pretends one exists: no name, email or message
+ * field, no newsletter signup, no submit endpoint, no validation, no success or
+ * loading state. No contact form endpoint has been approved.
+ *
+ * NO CONTACT DETAILS either - no email address (so no `mailto:`), no phone, no
+ * postal address, no opening hours and no social profiles. None of those have
+ * been supplied, and none are invented or faked with placeholders.
+ *
+ * Ships no JavaScript.
+ */
+import Container from './ui/Container.astro';
+import Section from './ui/Section.astro';
+import Eyebrow from './ui/Eyebrow.astro';
+import Button from './ui/Button.astro';
+
+interface Props {
+  eyebrow: string;
+  heading: string;
+  body: string;
+  action: { href: string; label: string };
+}
+
+const { eyebrow, heading, body, action } = Astro.props;
+---
+
+{/*
+  The pale sage accent surface - the design system reserves it for accent
+  surfaces, and this single closing moment is what using it "sparingly" means.
+*/}
+<Section id="contact" tone="accent" aria-labelledby="contact-heading">
+  <Container width="content">
+    <div class="contact__inner">
+      <Eyebrow class="contact__eyebrow" tone="accent">{eyebrow}</Eyebrow>
+      <h2 class="t-h2 contact__heading" id="contact-heading">{heading}</h2>
+      <p class="contact__body">{body}</p>
+
+      <p class="contact__action">
+        {/* A normal internal link to a real route. */}
+        <Button variant="primary" href={action.href}>{action.label}</Button>
+      </p>
+    </div>
+  </Container>
+</Section>

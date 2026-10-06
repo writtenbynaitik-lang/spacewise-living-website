@@ -1,0 +1,83 @@
+---
+/**
+ * ProductRecommendation - the "Smart Storage Find" editorial module.
+ *
+ * Designed to read as useful editorial guidance, not as an ad. The visual
+ * hierarchy puts the PROBLEM first and the product second, which is the whole
+ * point: the reader came for the problem.
+ *
+ * There is deliberately no price, rating, review count, discount, availability
+ * or badge prop. The content schema has no fields for them either, so there is
+ * nowhere for fabricated commerce data to live until verified product data
+ * exists.
+ *
+ * `href` and `disclosure` are supplied by the caller. No affiliate program has
+ * been approved yet, so nothing is defaulted here.
+ */
+import ImageFrame from './ImageFrame.astro';
+import Eyebrow from './Eyebrow.astro';
+import Button from './Button.astro';
+
+interface Props {
+  /** The organization problem this solves. This is the headline. */
+  problem: string;
+  /** Verified product name. */
+  name: string;
+  /** Why this helps in a small space. */
+  explanation: string;
+  /** Destination URL, including any affiliate tag. */
+  href?: string;
+  /** Visible link label, e.g. the retailer name. */
+  linkLabel?: string;
+  image?: { src?: string; alt?: string };
+  /** Label for the module itself. */
+  eyebrow?: string;
+  /** Required disclosure line when the link is an affiliate link. */
+  disclosure?: string;
+  class?: string;
+}
+
+const {
+  problem,
+  name,
+  explanation,
+  href,
+  linkLabel = 'View product',
+  image,
+  eyebrow = 'Smart storage find',
+  disclosure,
+  class: className,
+} = Astro.props;
+---
+
+<aside class:list={['recommendation', className]} aria-label={eyebrow}>
+  <div class="recommendation__media">
+    <ImageFrame
+      src={image?.src}
+      alt={image?.alt ?? ''}
+      ratio="square"
+      bordered
+      label="Product image"
+    />
+  </div>
+
+  <div class="recommendation__body">
+    <Eyebrow class="recommendation__eyebrow" tone="accent">{eyebrow}</Eyebrow>
+
+    <p class="recommendation__problem">{problem}</p>
+    <p class="recommendation__name">{name}</p>
+    <p class="recommendation__explanation">{explanation}</p>
+
+    {
+      href && (
+        <p class="recommendation__action">
+          <Button variant="secondary" size="sm" href={href} arrow>
+            {linkLabel}
+          </Button>
+        </p>
+      )
+    }
+
+    {disclosure && <p class="recommendation__disclosure">{disclosure}</p>}
+  </div>
+</aside>

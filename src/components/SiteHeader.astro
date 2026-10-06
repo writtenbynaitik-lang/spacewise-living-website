@@ -1,0 +1,291 @@
+---
+/**
+ * SpaceWise Living - site header and primary navigation.
+ *
+ * Structure:
+ *   wordmark  |  primary nav (desktop)  |  search · explore ideas · menu
+ *
+ * Below 70rem / 1120px the nav links move into a mobile menu panel. The desktop
+ * and mobile navigations are separate elements, and the hidden one is
+ * `display: none`, so exactly one "Primary" navigation landmark is ever exposed
+ * to assistive technology.
+ *
+ * Every destination is a real route in src/pages/. There are no `#` links and
+ * no invented pages.
+ */
+import {
+  primaryNav,
+  mobileNav,
+  mobileSecondaryNav,
+  primaryAction,
+  isCurrentPage,
+  isCurrentSection,
+} from '../config/navigation';
+import { site } from '../config/site';
+
+/** Current path, used for active-state marking. */
+const pathname = Astro.url.pathname;
+
+/** The primary action is "in section" on /articles/ and on any article page. */
+const actionIsCurrentPage = isCurrentPage(primaryAction.href, pathname);
+const actionInSection = isCurrentSection(primaryAction.href, pathname);
+---
+
+<div class="site-header-sentinel" aria-hidden="true"></div>
+
+<header class="site-header" id="site-header" data-stuck="false">
+  <div class="container container--content site-header__inner">
+    {/*
+      UNRESOLVED: final logo asset. The brand mark is set in type (Fraunces)
+      until a real asset is supplied - no logo graphic is invented here.
+    */}
+    <a class="site-header__brand" href="/">{site.name}</a>
+
+    <nav class="site-header__nav" aria-label="Primary">
+      <ul class="site-header__list">
+        {
+          primaryNav.map((link) => {
+            const current = isCurrentPage(link.href, pathname);
+            return (
+              <li>
+                <a
+                  class="site-header__link"
+                  href={link.href}
+                  aria-current={current ? 'page' : undefined}
+                >
+                  {link.label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      {/*
+        SEARCH.
+        A real link, not a button: it navigates to /search/ and does nothing
+        else, and an element's type should match its behaviour. It was a
+        <button> controlling a disclosure only while no search page existed.
+
+        The visible label is "Search" and the accessible name is
+        "Search SpaceWise Living", which contains it (WCAG 2.5.3).
+      */}
+      <a
+        class="header-icon-button site-header__search"
+        href="/search/"
+        aria-current={isCurrentPage('/search/', pathname) ? 'page' : undefined}
+        aria-label={`Search ${site.name}`}
+      >
+        <svg
+          class="header-icon-button__icon"
+          viewBox="0 0 20 20"
+          fill="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.6" />
+          <path d="m13.2 13.2 3.3 3.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+        <span class="header-icon-button__text">Search</span>
+      </a>
+
+      <a
+        class="button button--primary button--sm site-header__cta"
+        href={primaryAction.href}
+        aria-current={actionIsCurrentPage ? 'page' : undefined}
+        data-current={actionInSection ? 'true' : undefined}
+      >
+        {primaryAction.label}
+      </a>
+
+      <button
+        type="button"
+        class="header-icon-button site-header__menu-button"
+        id="menu-trigger"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Open menu"
+      >
+        <svg
+          class="header-icon-button__icon"
+          viewBox="0 0 20 20"
+          fill="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M3 5.5h14M3 10h14M3 14.5h14"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+          />
+        </svg>
+        <span class="visually-hidden">Menu</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <div class="container container--content mobile-menu__inner">
+      <nav aria-label="Primary">
+        <ul class="mobile-menu__list">
+          {
+            mobileNav.map((link) => {
+              const current = isCurrentPage(link.href, pathname);
+              return (
+                <li>
+                  <a
+                    class="mobile-menu__link"
+                    href={link.href}
+                    aria-current={current ? 'page' : undefined}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              );
+            })
+          }
+        </ul>
+
+        <ul class="mobile-menu__list mobile-menu__list--secondary">
+          {
+            mobileSecondaryNav.map((link) => {
+              const current = isCurrentPage(link.href, pathname);
+              return (
+                <li>
+                  <a
+                    class="mobile-menu__link"
+                    href={link.href}
+                    aria-current={current ? 'page' : undefined}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </nav>
+
+      <div class="mobile-menu__action">
+        <a class="button button--primary button--full" href={primaryAction.href}>
+          {primaryAction.label}
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  /**
+   * Header behaviour. Deliberately small and dependency-free.
+   *
+   *   1. Sticky "scrolled" state, via an IntersectionObserver on a 1px sentinel
+   *      (no scroll listener, so nothing runs on every frame).
+   *   2. Mobile menu: focus trap, Escape to close, close on navigation,
+   *      background made inert, background scroll locked, focus restored.
+   *
+   * Search is a plain link to /search/, so it needs no script at all.
+   */
+  const header = document.getElementById('site-header');
+  const sentinel = document.querySelector<HTMLElement>('.site-header-sentinel');
+
+  /* --- 1. Scrolled state ---------------------------------------------------- */
+  if (header && sentinel && 'IntersectionObserver' in window) {
+    new IntersectionObserver(
+      ([entry]) => header.setAttribute('data-stuck', String(!entry.isIntersecting)),
+      { threshold: 0 }
+    ).observe(sentinel);
+  }
+
+  /* --- 2. Mobile menu ------------------------------------------------------- */
+  const menuTrigger = document.getElementById('menu-trigger');
+  const menu = document.getElementById('mobile-menu');
+
+  /** Elements made inert while the menu is open, so the background is unreachable. */
+  const backgroundRegions = () =>
+    Array.from(document.querySelectorAll<HTMLElement>('main, footer'));
+
+  const FOCUSABLE =
+    'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+  let menuOpen = false;
+
+  function setMenuOpen(open: boolean) {
+    if (!menuTrigger || !menu) return;
+    menuOpen = open;
+    menu.hidden = !open;
+    menuTrigger.setAttribute('aria-expanded', String(open));
+    menuTrigger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.documentElement.classList.toggle('has-open-menu', open);
+
+    for (const region of backgroundRegions()) {
+      if (open) region.setAttribute('inert', '');
+      else region.removeAttribute('inert');
+    }
+
+    if (open) {
+      // Move focus into the menu so keyboard users land where they expect.
+      menu.querySelector<HTMLElement>(FOCUSABLE)?.focus();
+    }
+  }
+
+  menuTrigger?.addEventListener('click', () => {
+    const next = !menuOpen;
+    setMenuOpen(next);
+    if (!next) menuTrigger.focus();
+  });
+
+  /* Selecting a destination closes the menu. The browser then navigates, but
+     this keeps the state correct for same-page links and bfcache restores. */
+  menu?.addEventListener('click', (event) => {
+    if ((event.target as HTMLElement).closest('a[href]')) setMenuOpen(false);
+  });
+
+  /* --- 3. Keyboard ---------------------------------------------------------- */
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      if (menuOpen) {
+        setMenuOpen(false);
+        menuTrigger?.focus();
+      }
+      return;
+    }
+
+    // Focus trap: while the menu is open, Tab cycles through the menu and its
+    // trigger, so focus can never land on the inert background.
+    if (event.key !== 'Tab' || !menuOpen || !menu || !menuTrigger) return;
+
+    const items = [
+      menuTrigger,
+      ...Array.from(menu.querySelectorAll<HTMLElement>(FOCUSABLE)),
+    ].filter((el) => el.offsetParent !== null || el === menuTrigger);
+
+    if (items.length === 0) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+
+    if (event.shiftKey && active === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  /* Leaving the mobile layout while the menu is open would otherwise strand the
+     page in a locked, inert state. */
+  const navQuery = window.matchMedia('(min-width: 70rem)');
+  navQuery.addEventListener('change', (event) => {
+    if (event.matches && menuOpen) setMenuOpen(false);
+  });
+
+  /* Restoring from bfcache can replay the old open state. */
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) setMenuOpen(false);
+  });
+</script>

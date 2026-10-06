@@ -1,0 +1,99 @@
+---
+/**
+ * ArticleList — a grid of published articles, or an editorial empty state.
+ *
+ * THE EMPTY STATE IS THE POINT. No articles have been published yet, so this
+ * component's normal condition today is "nothing to list". It must therefore
+ * read as a finished, intentional part of the page rather than a gap or a
+ * failure — but it must not invent articles to fill the space.
+ *
+ * What the empty state deliberately avoids: fake titles, "coming soon",
+ * exclamation marks, countdowns, a signup form, and any claim about how many
+ * articles exist or when they will arrive.
+ */
+import ArticleCard from '../ui/ArticleCard.astro';
+import Button from '../ui/Button.astro';
+import Container from '../ui/Container.astro';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import type { ArticleCardData } from '../../lib/articles';
+
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  intro?: string;
+  articles: ArticleCardData[];
+  /** Shown in place of the grid when `articles` is empty. */
+  emptyMessage: string;
+  /** Optional "see everything" link, shown only when there are articles. */
+  viewAllHref?: string;
+  viewAllLabel?: string;
+  tone?: 'page' | 'alt';
+  id?: string;
+}
+
+const {
+  eyebrow = 'Latest ideas',
+  heading,
+  intro,
+  articles,
+  emptyMessage,
+  viewAllHref,
+  viewAllLabel = 'View all articles',
+  tone = 'page',
+  id = 'latest',
+} = Astro.props;
+
+const hasArticles = articles.length > 0;
+---
+
+<Section id={id} tone={tone} aria-labelledby={`${id}-heading`}>
+  <Container width="content">
+    <header class="section-head">
+      <Eyebrow class="section-head__eyebrow">{eyebrow}</Eyebrow>
+      <h2 class="t-h2 section-head__heading" id={`${id}-heading`}>{heading}</h2>
+      {intro && <p class="section-head__intro">{intro}</p>}
+    </header>
+
+    {
+      hasArticles ? (
+        <>
+          <ul class="article-grid">
+            {articles.map((article) => (
+              <li>
+                <ArticleCard
+                  title={article.title}
+                  href={article.href}
+                  excerpt={article.excerpt}
+                  eyebrow={article.eyebrow}
+                  image={article.image}
+                  date={article.date}
+                  dateLabel={article.dateLabel}
+                  readingTimeMinutes={article.readingTimeMinutes}
+                  boxed={tone === 'alt'}
+                />
+              </li>
+            ))}
+          </ul>
+
+          {viewAllHref && (
+            <div class="article-grid__action">
+              <Button href={viewAllHref} variant="secondary" arrow>
+                {viewAllLabel}
+              </Button>
+            </div>
+          )}
+        </>
+      ) : (
+        /*
+          EMPTY STATE. One quiet panel, one sentence. It says what will appear
+          here and nothing else — no invented article count, no date, no
+          promise about timing.
+        */
+        <div class="empty-state">
+          <p class="empty-state__message">{emptyMessage}</p>
+        </div>
+      )
+    }
+  </Container>
+</Section>

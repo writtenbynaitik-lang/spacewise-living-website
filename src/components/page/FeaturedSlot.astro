@@ -1,0 +1,81 @@
+---
+/**
+ * FeaturedSlot — the lead content slot on a category page or the article index.
+ *
+ * Two states, and the difference between them matters more than the design:
+ *
+ *   article supplied  → a real featured ArticleCard
+ *   no article yet    → a clearly marked placeholder
+ *
+ * The placeholder is NOT dressed up to look like a published article. It has no
+ * invented title, excerpt, byline, date or reading time, and it is not a link,
+ * because there is nothing to link to. It states what will occupy the slot and
+ * stops there. Dropping a real article in later replaces it with no layout
+ * change — the slot reserves the same space either way.
+ */
+import ArticleCard from '../ui/ArticleCard.astro';
+import Container from '../ui/Container.astro';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import type { ArticleCardData } from '../../lib/articles';
+
+interface Props {
+  /** The lead article, when one exists. */
+  article?: ArticleCardData;
+  /** Section label, e.g. "Featured". */
+  eyebrow?: string;
+  heading: string;
+  /**
+   * What will fill the slot, in the reader's terms. Shown only in the
+   * placeholder state.
+   */
+  placeholderNote: string;
+  tone?: 'page' | 'alt';
+}
+
+const {
+  article,
+  eyebrow = 'Featured',
+  heading,
+  placeholderNote,
+  tone = 'alt',
+} = Astro.props;
+---
+
+<Section tone={tone} aria-labelledby="featured-heading">
+  <Container width="content">
+    <header class="section-head">
+      <Eyebrow class="section-head__eyebrow">{eyebrow}</Eyebrow>
+      <h2 class="t-h2 section-head__heading" id="featured-heading">{heading}</h2>
+    </header>
+
+    {
+      article ? (
+        <ArticleCard
+          variant="featured"
+          title={article.title}
+          href={article.href}
+          excerpt={article.excerpt}
+          eyebrow={article.eyebrow}
+          image={article.image}
+          date={article.date}
+          dateLabel={article.dateLabel}
+          readingTimeMinutes={article.readingTimeMinutes}
+        />
+      ) : (
+        /*
+          PLACEHOLDER STATE. Deliberately not a card and not a link: a
+          disabled-looking card invites a click that goes nowhere, and a fake
+          title would be exactly the fabrication this project forbids.
+        */
+        <div class="placeholder placeholder--featured">
+          <div class="frame frame--editorial placeholder__frame" aria-hidden="true" />
+          <div class="placeholder__body">
+            <p class="placeholder__label">Featured article placeholder</p>
+            <p class="placeholder__note">{placeholderNote}</p>
+          </div>
+        </div>
+      )
+    }
+  </Container>
+</Section>

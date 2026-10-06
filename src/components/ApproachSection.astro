@@ -1,0 +1,73 @@
+---
+/**
+ * SpaceWise Living - "The SpaceWise approach" (#approach).
+ *
+ * Editorial supporting content: the thinking behind the site's advice, as three
+ * principles. It closes the homepage's current flow with a deliberate visual
+ * pause after the image-led showcase.
+ *
+ * NOT TESTIMONIALS. SpaceWise Living has no approved testimonials, so none are
+ * invented: there are no quotes, names, roles, companies, ratings, reader
+ * counts, percentages, credentials, awards or press mentions anywhere in this
+ * section, and no props or markup that could carry them. These are editorial
+ * principles, not claims about customers or results.
+ *
+ * Deliberately has NO image, NO icons, NO call to action and NO marquee - the
+ * page already carries ten photographs and the hero's two actions. Typography
+ * and spacing do the work.
+ *
+ * The section ships no JavaScript and contains no animation.
+ */
+import Container from './ui/Container.astro';
+import Section from './ui/Section.astro';
+import Eyebrow from './ui/Eyebrow.astro';
+
+interface Principle {
+  title: string;
+  description: string;
+}
+
+interface Props {
+  eyebrow: string;
+  heading: string;
+  body: string;
+  /** Exactly three. */
+  principles: Principle[];
+}
+
+const { eyebrow, heading, body, principles } = Astro.props;
+---
+
+<Section id="approach" tone="alt" aria-labelledby="approach-heading">
+  <Container width="content">
+    <header class="approach__header">
+      {/*
+        Sentence case in the DOM, uppercased by the design system's .eyebrow
+        rule, so screen readers do not spell out an all-caps string.
+      */}
+      <Eyebrow class="approach__eyebrow">{eyebrow}</Eyebrow>
+      <h2 class="t-h2 approach__heading" id="approach-heading">{heading}</h2>
+      <p class="approach__body">{body}</p>
+    </header>
+
+    {/*
+      An ordered list: the principles build on each other, and the markup then
+      carries that order without the visible numbers having to.
+      `role="list"` because `list-style: none` drops list semantics in some
+      browsers.
+    */}
+    <ol class="approach__list" role="list">
+      {
+        principles.map((principle, index) => (
+          <li class="approach__item">
+            <p class="approach__number" aria-hidden="true">
+              {String(index + 1).padStart(2, '0')}
+            </p>
+            <h3 class="approach__title">{principle.title}</h3>
+            <p class="approach__description">{principle.description}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </Container>
+</Section>

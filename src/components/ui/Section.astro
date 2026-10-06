@@ -1,0 +1,52 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+/**
+ * Section - vertical rhythm and optional alternate background.
+ *
+ * Section spacing is the main tool for a sense of progression down a page.
+ * `tone="alt"` and `tone="accent"` run edge-to-edge; the Container inside keeps
+ * the gutters. Avoid two toned sections in a row - the rhythm depends on
+ * contrast with the default page background.
+ */
+/**
+ * Any remaining HTML attributes (`id`, `aria-labelledby`, `data-*`) pass through
+ * to the rendered element, so a real page section can be labelled and linked
+ * without needing a wrapper around this component.
+ */
+type Props = HTMLAttributes<'section'> & {
+  /** Vertical padding. `lg` marks a major editorial transition. */
+  space?: 'sm' | 'base' | 'lg';
+  tone?: 'page' | 'alt' | 'accent';
+  flushTop?: boolean;
+  flushBottom?: boolean;
+  as?: 'section' | 'div' | 'aside';
+  class?: string;
+};
+
+const {
+  space = 'base',
+  tone = 'page',
+  flushTop = false,
+  flushBottom = false,
+  as: Tag = 'section',
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<Tag
+  class:list={[
+    'section',
+    space === 'sm' && 'section--sm',
+    space === 'lg' && 'section--lg',
+    tone === 'alt' && 'section--alt',
+    tone === 'accent' && 'section--accent',
+    flushTop && 'section--flush-top',
+    flushBottom && 'section--flush-bottom',
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</Tag>

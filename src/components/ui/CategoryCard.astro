@@ -1,0 +1,31 @@
+---
+/**
+ * CategoryCard - a short link card for one content category.
+ *
+ * These appear eight at a time, so the treatment is deliberately lighter than
+ * an ArticleCard: no image by default, small type, a quiet sage hover.
+ *
+ * `count` is optional and must be a real number passed by the caller - it is
+ * never guessed or padded.
+ */
+interface Props {
+  name: string;
+  href: string;
+  /** Real article count, when the caller has one. */
+  count?: number;
+  class?: string;
+}
+
+const { name, href, count, class: className } = Astro.props;
+---
+
+<a class:list={['category-card', className]} href={href}>
+  <span class="category-card__name">{name}</span>
+  {
+    typeof count === 'number' && (
+      <span class="category-card__count">
+        {count} {count === 1 ? 'article' : 'articles'}
+      </span>
+    )
+  }
+</a>

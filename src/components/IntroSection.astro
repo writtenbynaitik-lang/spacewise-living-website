@@ -1,0 +1,98 @@
+---
+/**
+ * SpaceWise Living - homepage introduction.
+ *
+ * The first content section below the hero. It carries the page from the hero's
+ * promise into what the site actually offers, as an editorial two-column
+ * feature: copy on the left, supporting photograph on the right.
+ *
+ * NO MARQUEE, by decision: SpaceWise Living is an editorial content
+ * destination, and a looping text strip would add motion and noise without
+ * helping anyone read or use the content. There is no marquee markup, CSS,
+ * JavaScript, asset or animation control anywhere in this section.
+ *
+ * NO CTA, by decision: the hero already carries both visitor actions, and a
+ * third button here would dilute them.
+ *
+ * The section ships no JavaScript.
+ */
+import { Picture } from 'astro:assets';
+import Eyebrow from './ui/Eyebrow.astro';
+import Container from './ui/Container.astro';
+import Section from './ui/Section.astro';
+import type { IntroMedia } from '../config/intro-media';
+
+interface Props {
+  eyebrow: string;
+  heading: string;
+  /** Body copy, split so one phrase can carry restrained emphasis. */
+  bodyBefore: string;
+  bodyEmphasis: string;
+  bodyAfter: string;
+  /** Supplied from src/config/intro-media.ts; null until an asset exists. */
+  media?: IntroMedia | null;
+}
+
+const { eyebrow, heading, bodyBefore, bodyEmphasis, bodyAfter, media } = Astro.props;
+
+/**
+ * Matches the rendered box at each tier:
+ *   >= 70rem  two columns - the image is 58% of the container, about 650px
+ *   >= 45rem  stacked, but capped by the media's 720px max-width
+ *   below     stacked and full-column-width, so 92vw after gutters
+ *
+ * The 70rem breakpoint mirrors intro.css. An earlier value of 64rem was wrong
+ * once the two-column switch moved to 70rem: between those widths the layout is
+ * stacked and the box is up to 720px, so the browser was told to fetch a file
+ * narrower than the space it had to fill.
+ */
+const INTRO_SIZES = '(min-width: 70rem) 650px, (min-width: 45rem) 720px, 92vw';
+const INTRO_WIDTHS = [320, 480, 650, 960, 1300];
+---
+
+<Section id="intro" tone="alt" aria-labelledby="intro-heading">
+  <Container width="content" class="grid intro__inner">
+    <div class="intro__text">
+      {/*
+        Sentence case in the DOM, uppercased by the design system's .eyebrow
+        rule, so screen readers do not spell out an all-caps string.
+      */}
+      <Eyebrow class="intro__eyebrow">{eyebrow}</Eyebrow>
+
+      <h2 class="t-h2 intro__heading" id="intro-heading">{heading}</h2>
+
+      <p class="intro__body">
+        {bodyBefore}<em class="intro__emphasis">{bodyEmphasis}</em>{bodyAfter}
+      </p>
+    </div>
+
+    <div class="intro__media-wrap">
+      {
+        media ? (
+          <div class="frame intro__media">
+            <Picture
+              src={media.src}
+              alt={media.alt}
+              widths={INTRO_WIDTHS}
+              sizes={INTRO_SIZES}
+              formats={['avif', 'webp']}
+              fallbackFormat="jpeg"
+              /* Below the fold, so unlike the hero this one is lazy. */
+              loading="lazy"
+              decoding="async"
+              onerror="this.closest('.frame')?.setAttribute('data-media-failed','true')"
+            />
+          </div>
+        ) : (
+          /*
+            No supporting photograph has been supplied. Rather than reuse the
+            hero image or substitute a stock one, the slot renders as a quiet
+            warm panel: the two-column composition is preserved and the copy
+            reads normally. aria-hidden because it carries no information.
+          */
+          <div class="frame intro__media intro__media--empty" aria-hidden="true" />
+        )
+      }
+    </div>
+  </Container>
+</Section>

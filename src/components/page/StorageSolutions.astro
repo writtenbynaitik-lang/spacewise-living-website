@@ -1,0 +1,99 @@
+---
+/**
+ * StorageSolutions — the slot that will eventually hold product recommendations.
+ *
+ * WHY THIS EXISTS NOW, EMPTY: the affiliate model is part of the project brief,
+ * and retro-fitting a commerce section into finished pages tends to produce the
+ * Amazon-storefront look this brand must avoid. Reserving the slot now fixes
+ * where recommendations live (one restrained block, after the ideas, before the
+ * reader leaves) and how many there are.
+ *
+ * WHAT IS NOT HERE, AND WHY: no product names, prices, ratings, review counts,
+ * retailers, availability, specifications or affiliate URLs. None of that has
+ * been supplied, and the content schema has no fields for most of it, so there
+ * is nowhere for invented commerce data to live. The placeholder says the slot
+ * is reserved and does not imply any affiliate relationship exists.
+ *
+ * TO ACTIVATE: pass `recommendations`. Each entry renders through the existing
+ * ProductRecommendation module, which already puts the PROBLEM above the
+ * product. Nothing here changes.
+ */
+import ProductRecommendation from '../ui/ProductRecommendation.astro';
+import Container from '../ui/Container.astro';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+
+export interface StorageSolution {
+  /** The organization problem this solves — the headline of the module. */
+  problem: string;
+  /** Verified product name. Never a guess. */
+  name: string;
+  /** Why it helps in a small space. */
+  explanation: string;
+  /** Destination URL including any affiliate tag. */
+  href?: string;
+  linkLabel?: string;
+  image?: { src?: string; alt?: string };
+  /** Required disclosure line whenever `href` is an affiliate link. */
+  disclosure?: string;
+}
+
+interface Props {
+  heading?: string;
+  eyebrow?: string;
+  /** Verified recommendations. Empty today for every category. */
+  recommendations?: StorageSolution[];
+  /** What the slot is for, in the reader's terms. */
+  placeholderNote: string;
+}
+
+const {
+  heading = 'Storage solutions worth considering',
+  eyebrow = 'Storage solutions',
+  recommendations = [],
+  placeholderNote,
+} = Astro.props;
+
+const hasRecommendations = recommendations.length > 0;
+---
+
+<Section tone="alt" aria-labelledby="solutions-heading">
+  <Container width="content">
+    <header class="section-head">
+      <Eyebrow class="section-head__eyebrow">{eyebrow}</Eyebrow>
+      <h2 class="t-h2 section-head__heading" id="solutions-heading">{heading}</h2>
+    </header>
+
+    {
+      hasRecommendations ? (
+        <div class="solutions">
+          {recommendations.map((item) => (
+            <ProductRecommendation
+              problem={item.problem}
+              name={item.name}
+              explanation={item.explanation}
+              href={item.href}
+              linkLabel={item.linkLabel}
+              image={item.image}
+              disclosure={item.disclosure}
+            />
+          ))}
+        </div>
+      ) : (
+        /*
+          Reserved, and honest about it. No fake product card, no disabled
+          "View product" button — an affiliate button with no program behind it
+          would imply a relationship that does not exist.
+        */
+        <div class="placeholder placeholder--solutions">
+          <p class="placeholder__label">Product recommendations placeholder</p>
+          <p class="placeholder__note">{placeholderNote}</p>
+          <p class="placeholder__note">
+            How recommendations will work is set out in the{' '}
+            <a href="/affiliate-disclosure/">affiliate disclosure</a>.
+          </p>
+        </div>
+      )
+    }
+  </Container>
+</Section>

@@ -1,0 +1,415 @@
+/* =============================================================================
+   SpaceWise Living — SITE HEADER
+
+   A compact, sticky editorial header. It stays available while reading without
+   taking editorial space or drawing attention from the content.
+
+   Deliberately NOT: a glassmorphism bar, a floating card, a shrinking/hiding
+   header, or a mega menu. The scroll treatment is a hairline and a whisper of
+   shadow — nothing moves, nothing resizes, so the header is always predictable.
+
+   BREAKPOINT: the desktop layout starts at 70rem / 1120px (--bp-nav). That is
+   measured, not guessed: the wordmark, six links, search and the primary action
+   need roughly 1000px of content width, and at 1024px the available width
+   inside the gutters is ~930px. Switching at 1120px means the desktop header is
+   never cramped.
+   ========================================================================== */
+
+@layer components {
+  /* Invisible 1px marker directly above the header. An IntersectionObserver
+     watches it, so the scrolled state costs no scroll listener. */
+  .site-header-sentinel {
+    height: 1px;
+    margin-block-end: -1px;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: var(--color-page);
+    border-block-end: 1px solid transparent;
+    transition: border-color var(--duration-base) var(--ease-standard),
+      box-shadow var(--duration-base) var(--ease-standard);
+  }
+
+  /* Scrolled state: a hairline plus a barely-there shadow, purely to keep the
+     header readable over content. No size or position change. */
+  .site-header[data-stuck='true'] {
+    border-block-end-color: var(--color-border);
+    box-shadow: var(--shadow-subtle);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    /* Allows the actions to drop to a second row at very large text sizes,
+       where the wordmark plus both buttons genuinely cannot share one line.
+       Wrapping the ROW is better than letting the brand name break mid-word. */
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-md);
+    min-height: var(--header-height);
+    /* Respect notches in landscape without losing the gutter system. */
+    padding-inline-start: max(var(--gutter), env(safe-area-inset-left));
+    padding-inline-end: max(var(--gutter), env(safe-area-inset-right));
+  }
+
+  /* ---------------------------------------------------------------------------
+     WORDMARK
+     Typography is the brand mark. No logo graphic is invented.
+     ------------------------------------------------------------------------ */
+  .site-header__brand {
+    flex: 0 1 auto;
+    font-family: var(--font-editorial);
+    font-size: var(--text-h4);
+    font-weight: var(--weight-semibold);
+    line-height: 1.1;
+    letter-spacing: var(--tracking-heading);
+    color: var(--color-ink);
+    text-decoration: none;
+    /* Deliberately NOT `nowrap` in the mobile layout. The wordmark is set in
+       rem, so at a 200% browser text size it grows to roughly 290px — with
+       `nowrap` that forced the header's actions past a 390px viewport and the
+       whole page scrolled sideways. Found while testing resize-text during the
+       hero step. It wraps at the space instead; `overflow-wrap` is deliberately
+       NOT set, so "SpaceWise" is never broken in half. */
+  }
+
+  .site-header__brand:hover {
+    color: var(--color-accent);
+  }
+
+  /* ---------------------------------------------------------------------------
+     DESKTOP NAVIGATION
+     Hidden below --bp-nav; `display: none` keeps it out of the accessibility
+     tree entirely, so the desktop and mobile navs never both expose a Primary
+     landmark.
+     ------------------------------------------------------------------------ */
+  .site-header__nav {
+    display: none;
+  }
+
+  .site-header__list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    list-style: none;
+  }
+
+  .site-header__link {
+    position: relative;
+    display: inline-block;
+    padding-block: var(--space-2xs);
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--duration-fast) var(--ease-standard);
+  }
+
+  /* Hover: colour AND an underline, so the affordance never depends on hue. */
+  .site-header__link:hover {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.35em;
+  }
+
+  /* -- Active / current page ------------------------------------------------
+     Three simultaneous signals, none of them colour alone: darker ink, a
+     heavier weight, and a short sage rule under the label. Deliberately not a
+     filled pill — this is an editorial header, not an app tab bar. */
+  .site-header__link[aria-current] {
+    color: var(--color-ink);
+    font-weight: var(--weight-semibold);
+  }
+
+  .site-header__link[aria-current]::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -2px;
+    height: 2px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-accent);
+  }
+
+  .site-header__link[aria-current]:hover {
+    text-decoration: none;
+  }
+
+  /* ---------------------------------------------------------------------------
+     ACTIONS — search, primary action, menu button
+     ------------------------------------------------------------------------ */
+  .site-header__actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--space-2xs);
+    /* Pushes the actions to the trailing edge, on their own row when wrapped. */
+    margin-inline-start: auto;
+  }
+
+  /* Icon-style control used by both Search and Menu. 44px tap target.
+     Search is an <a> and Menu is a <button>, so this carries the link resets
+     too — the two must stay visually identical. */
+  .header-icon-button {
+    display: inline-flex;
+    text-decoration: none;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2xs);
+    min-width: var(--tap-target-min);
+    min-height: var(--tap-target-min);
+    padding-inline: var(--space-2xs);
+    border: 1px solid transparent;
+    border-radius: var(--radius-button);
+    background-color: transparent;
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard);
+  }
+
+  .header-icon-button:hover {
+    background-color: var(--color-surface-alt);
+    color: var(--color-ink);
+  }
+
+  /* Open state (menu) and current-page state (search) share one treatment: a
+     border and a filled background, never colour alone. Both are also exposed
+     programmatically — aria-expanded for the menu, aria-current for search. */
+  .header-icon-button[aria-expanded='true'],
+  .header-icon-button[aria-current] {
+    background-color: var(--color-surface-alt);
+    border-color: var(--color-border-interactive);
+    color: var(--color-ink);
+  }
+
+  .header-icon-button__icon {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  /* The word "Search" appears beside the icon only when there is room for it. */
+  .header-icon-button__text {
+    display: none;
+  }
+
+  /* The primary action is hidden on mobile — it lives inside the menu there.
+     Scoped to .site-header so it out-specifies `.button { display: inline-flex }`
+     regardless of stylesheet import order. */
+  .site-header .site-header__cta {
+    display: none;
+  }
+
+  /* Current-section treatment for the primary action, e.g. while reading an
+     article. Secondary styling plus the sage rule, never a colour-only change. */
+  .site-header__cta[data-current='true'] {
+    background-color: transparent;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .site-header__cta[data-current='true']:hover {
+    background-color: var(--color-accent-soft);
+    border-color: var(--color-accent);
+  }
+
+  /* ---------------------------------------------------------------------------
+     MOBILE MENU
+     A panel anchored under the header, not a generic slide-in drawer. It scrolls
+     internally on short viewports and never exceeds the space below the header.
+     ------------------------------------------------------------------------ */
+  .mobile-menu {
+    position: fixed;
+    inset-block-start: var(--header-height);
+    inset-inline: 0;
+    z-index: 49;
+    /* Fills the space below the header rather than floating as a content-sized
+       card. That removes the strip of still-visible page underneath, which
+       would otherwise look interactive while the background is inert. `dvh`
+       accounts for mobile browser chrome appearing and disappearing. */
+    height: calc(100dvh - var(--header-height));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background-color: var(--color-page);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .mobile-menu[hidden] {
+    display: none;
+  }
+
+  .mobile-menu__inner {
+    /* Column layout so the primary action can sit at the bottom on tall
+       screens and directly after the links on short ones. */
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding-block: var(--space-md);
+    /* Keep the last item clear of the home indicator on gesture phones. */
+    padding-block-end: max(var(--space-lg), env(safe-area-inset-bottom));
+    padding-inline-start: max(var(--gutter), env(safe-area-inset-left));
+    padding-inline-end: max(var(--gutter), env(safe-area-inset-right));
+  }
+
+  .mobile-menu__list {
+    list-style: none;
+  }
+
+  .mobile-menu__link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-target-min);
+    padding-block: var(--space-2xs);
+    font-family: var(--font-interface);
+    font-size: var(--text-h4);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    color: var(--color-ink);
+    text-decoration: none;
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .mobile-menu__list > li:last-child .mobile-menu__link {
+    border-block-end: none;
+  }
+
+  .mobile-menu__link:hover {
+    color: var(--color-accent);
+  }
+
+  /* Active page: weight, colour and a sage marker in the leading gutter. */
+  .mobile-menu__link[aria-current] {
+    font-weight: var(--weight-semibold);
+    color: var(--color-accent);
+  }
+
+  .mobile-menu__link[aria-current]::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: calc(var(--space-2xs) * -1);
+    inset-block: var(--space-2xs);
+    width: 2px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-accent);
+  }
+
+  /* Secondary group — About / Contact. Smaller, so the menu stays a discovery
+     tool rather than a site map. */
+  .mobile-menu__list--secondary {
+    margin-block-start: var(--space-md);
+    padding-block-start: var(--space-md);
+    border-block-start: 1px solid var(--color-border-strong);
+  }
+
+  .mobile-menu__list--secondary .mobile-menu__link {
+    min-height: 40px;
+    font-size: var(--text-body);
+    color: var(--color-text-secondary);
+    border-block-end: none;
+  }
+
+  .mobile-menu__list--secondary .mobile-menu__link[aria-current] {
+    color: var(--color-accent);
+  }
+
+  .mobile-menu__action {
+    /* `auto` anchors it to the bottom when there is spare height; the padding
+       guarantees separation from the last link when there is not. */
+    margin-block-start: auto;
+    padding-block-start: var(--space-xl);
+  }
+
+  /* ---------------------------------------------------------------------------
+     MOTION
+     One short fade/offset on open. Nothing animates on close beyond the same
+     transition, and reduced motion removes the movement entirely.
+     ------------------------------------------------------------------------ */
+  @media (prefers-reduced-motion: no-preference) {
+    .mobile-menu:not([hidden]) {
+      animation: header-panel-in var(--duration-base) var(--ease-out);
+    }
+  }
+
+  @keyframes header-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(-0.375rem);
+    }
+  }
+
+  /* Locks background scrolling while the menu is open. `scrollbar-gutter` on
+     <html> (reset.css) keeps this from shifting the layout. */
+  .has-open-menu {
+    overflow: hidden;
+  }
+
+  /* ---------------------------------------------------------------------------
+     DESKTOP LAYOUT — from 70rem / 1120px
+     ------------------------------------------------------------------------ */
+  @media (min-width: 70rem) {
+    .site-header__inner {
+      min-height: var(--header-height-lg);
+      gap: var(--space-lg);
+    }
+
+    .site-header__brand {
+      font-size: var(--text-h3);
+      margin-inline-end: 0;
+      /* Desktop always has room for one line. */
+      white-space: nowrap;
+    }
+
+    .site-header__nav {
+      display: block;
+      /* Centres the link group in the leftover space between the wordmark and
+         the actions, rather than pinning it to either side. */
+      margin-inline: auto;
+    }
+
+    .site-header .site-header__cta {
+      display: inline-flex;
+    }
+
+    .header-icon-button__text {
+      display: inline;
+    }
+
+    .header-icon-button {
+      padding-inline: var(--space-xs);
+    }
+
+    /* The menu button only exists for the mobile layout. Same specificity
+       guard as the CTA above, against `.header-icon-button`. */
+    .site-header .site-header__menu-button {
+      display: none;
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+  }
+
+  /* Slightly tighter link spacing between the breakpoint and the point where
+     the container stops growing, so nothing collides at 1120–1280px. */
+  @media (min-width: 70rem) and (max-width: 80rem) {
+    .site-header__list {
+      gap: var(--space-sm);
+    }
+
+    .site-header__inner {
+      gap: var(--space-md);
+    }
+  }
+}

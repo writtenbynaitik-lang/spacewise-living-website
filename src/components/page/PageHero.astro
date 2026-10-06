@@ -1,0 +1,64 @@
+---
+/**
+ * PageHero — the opening block for a destination page (category, articles).
+ *
+ * Deliberately NOT a copy of the homepage hero. That hero is a two-column
+ * editorial statement with a tall photograph; repeating it on ten more pages
+ * would make every route read like a landing page and push the actual content
+ * below a second fold. This is a quieter stack — label, title, one line — with
+ * an optional wide photograph underneath.
+ *
+ * The homepage hero is untouched by this component.
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Container from '../ui/Container.astro';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  deck: string;
+  /**
+   * Optional photograph. When a page has none the block simply ends after the
+   * deck — no stand-in image is substituted.
+   */
+  image?: { src: ImageMetadata; alt: string };
+  id?: string;
+}
+
+const { eyebrow, title, deck, image, id = 'page-hero' } = Astro.props;
+
+/** Full content column at desktop, near-full viewport below it. */
+const SIZES = '(min-width: 70rem) 1120px, 92vw';
+const WIDTHS = [640, 960, 1280, 1680];
+---
+
+<Section id={id} space="lg" flushBottom>
+  <Container width="content">
+    <div class="page-hero">
+      <Eyebrow class="page-hero__eyebrow" marked>{eyebrow}</Eyebrow>
+      <h1 class="t-h1 page-hero__title">{title}</h1>
+      <p class="t-deck page-hero__deck">{deck}</p>
+    </div>
+
+    {
+      image && (
+        <div class="frame page-hero__media">
+          <Picture
+            src={image.src}
+            alt={image.alt}
+            widths={WIDTHS}
+            sizes={SIZES}
+            formats={['avif', 'webp']}
+            fallbackFormat="jpeg"
+            loading="eager"
+            decoding="async"
+            onerror="this.closest('.frame')?.setAttribute('data-media-failed','true')"
+          />
+        </div>
+      )
+    }
+  </Container>
+</Section>

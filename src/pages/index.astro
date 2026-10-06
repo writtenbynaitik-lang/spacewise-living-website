@@ -1,0 +1,133 @@
+---
+/**
+ * / - Homepage.
+ *
+ * Currently: the site header, the hero, and the introduction section.
+ *
+ * The remaining homepage sections (article highlights, category discovery and
+ * so on) are later steps.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import IntroSection from '../components/IntroSection.astro';
+import ExploreSection from '../components/ExploreSection.astro';
+import ApproachSection from '../components/ApproachSection.astro';
+import ContactSection from '../components/ContactSection.astro';
+import { site } from '../config/site';
+import { approach } from '../config/approach';
+import { heroMedia } from '../config/hero-media';
+import { introMedia } from '../config/intro-media';
+
+/**
+ * Approved homepage hero copy.
+ *
+ * Capitalisation note: the supplied headline and CTA labels were written in
+ * title case, while the same brief and design-system.md §4 both specify
+ * sentence case and the header's action already reads "Explore ideas". They are
+ * rendered in sentence case for consistency; the wording is unchanged. Flip the
+ * strings here to revert.
+ */
+const hero = {
+  eyebrow: 'Small space organization',
+  heading: 'Make more room for the life you actually live.',
+  body:
+    'Smart storage ideas, organization solutions, and practical inspiration for ' +
+    'making small spaces feel bigger, calmer, and easier to live in.',
+  primaryCta: { href: '/articles/', label: 'Explore ideas' },
+  secondaryCta: { href: '/small-spaces/', label: 'Browse by room' },
+};
+
+/**
+ * Approved introduction copy.
+ *
+ * The body is split into three parts so one phrase can carry restrained
+ * emphasis without putting markup in a content string. Joined, it reads exactly
+ * as approved - the wording is unchanged.
+ */
+const intro = {
+  eyebrow: 'A smarter way to use your space',
+  heading: 'Small space. Smarter living.',
+  bodyBefore:
+    "Small spaces don't have to feel cramped. SpaceWise Living brings together " +
+    'practical storage ideas, organization solutions, and realistic inspiration ' +
+    'to help you ',
+  bodyEmphasis: 'make the most of every room',
+  bodyAfter: ' — without making your home feel over-designed.',
+};
+
+/**
+ * Approved showcase copy. The eight category cards themselves come from
+ * src/config/categories.ts, so there is no second copy of that list here.
+ */
+const explore = {
+  eyebrow: 'Find your space',
+  heading: 'Explore by room.',
+  intro:
+    'Start with the room that needs the most attention. Discover practical ' +
+    'organization ideas, storage solutions, and small-space inspiration ' +
+    'designed around how you actually live.',
+};
+
+/**
+ * Approved supporting content. Editorial principles only - no testimonials,
+ * quotes, names, metrics or any other social proof, none of which exist.
+ */
+/**
+ * Approved closing contact copy.
+ *
+ * No email, phone, address, hours or social profile appears here - none has
+ * been supplied. The action is an ordinary internal link to the real /contact/
+ * route, not a `mailto:` and not a form.
+ */
+const contact = {
+  eyebrow: "Let's connect",
+  heading: 'Have a question or idea?',
+  body:
+    "We'd love to hear from you. Visit our contact page for ways to get in touch.",
+  action: { href: '/contact/', label: 'Contact us' },
+};
+---
+
+<BaseLayout title="Home" description={site.positioning} isHome={true} bare>
+  <Hero
+    eyebrow={hero.eyebrow}
+    heading={hero.heading}
+    body={hero.body}
+    primaryCta={hero.primaryCta}
+    secondaryCta={hero.secondaryCta}
+    media={heroMedia}
+  />
+
+  {/*
+    The introduction carries the warm background change that separates the hero
+    from what follows, so no separate transition band is needed.
+  */}
+  <IntroSection
+    eyebrow={intro.eyebrow}
+    heading={intro.heading}
+    bodyBefore={intro.bodyBefore}
+    bodyEmphasis={intro.bodyEmphasis}
+    bodyAfter={intro.bodyAfter}
+    media={introMedia}
+  />
+
+  <ExploreSection
+    eyebrow={explore.eyebrow}
+    heading={explore.heading}
+    intro={explore.intro}
+  />
+
+  <ApproachSection
+    eyebrow={approach.eyebrow}
+    heading={approach.heading}
+    body={approach.body}
+    principles={approach.principles}
+  />
+
+  <ContactSection
+    eyebrow={contact.eyebrow}
+    heading={contact.heading}
+    body={contact.body}
+    action={contact.action}
+  />
+</BaseLayout>

@@ -1,0 +1,102 @@
+---
+/**
+ * /<category>/ — Category index. One route file serves all eight categories.
+ *
+ * ARCHITECTURE: there is exactly one category page. Everything that differs
+ * between Kitchen and Entryway — title, description, photograph, topics,
+ * related rooms — is data in `src/config/categories.ts`. Adding a ninth
+ * category needs an entry there and no new file, and a layout change here
+ * changes all eight at once.
+ *
+ * SECTION ORDER (fixed, so every room page reads the same way):
+ *   hero → featured → topics → latest ideas → storage solutions
+ *   → related rooms → editorial CTA → footer
+ *
+ * HONEST STATES: no articles are published and no verified product data exists,
+ * so the featured slot, the article list and the storage-solutions block all
+ * render their reserved/empty states. None of them invent content. Each becomes
+ * real content with no layout change once the data exists.
+ *
+ * Astro resolves static routes (/about/, /articles/) before this dynamic route,
+ * so informational pages are unaffected by it.
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/page/PageHero.astro';
+import FeaturedSlot from '../../components/page/FeaturedSlot.astro';
+import TopicList from '../../components/page/TopicList.astro';
+import ArticleList from '../../components/page/ArticleList.astro';
+import StorageSolutions from '../../components/page/StorageSolutions.astro';
+import RelatedRooms from '../../components/page/RelatedRooms.astro';
+import EditorialCta from '../../components/page/EditorialCta.astro';
+import {
+  categories,
+  relatedCategories,
+  type Category,
+} from '../../config/categories';
+import { getPublishedArticles, toCardDataList } from '../../lib/articles';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return categories.map((category) => ({
+    params: { category: category.slug },
+    props: { category },
+  }));
+};
+
+interface Props {
+  category: Category;
+}
+
+const { category } = Astro.props as Props;
+
+const articles = await getPublishedArticles(category.slug);
+
+/**
+ * The newest article leads the page; the rest fill the list below. With no
+ * articles published both are empty, which is the state the components below
+ * are built to handle.
+ */
+const [featured, ...rest] = articles;
+const featuredCard = featured ? (await toCardDataList([featured]))[0] : undefined;
+const listCards = await toCardDataList(rest);
+
+const related = relatedCategories(category);
+const room = category.name.toLowerCase();
+---
+
+<BaseLayout title={`${category.name} Organization`} description={category.blurb} bare>
+  <PageHero
+    eyebrow="SpaceWise rooms"
+    title={category.name}
+    deck={category.blurb}
+    image={category.image}
+  />
+
+  <FeaturedSlot
+    heading={`Start here: ${category.name.toLowerCase()} storage`}
+    article={featuredCard}
+    placeholderNote={`The lead ${room} guide will appear here once it is published.`}
+  />
+
+  <TopicList
+    heading={`${category.name} problems worth solving`}
+    intro={`The ${room} storage problems SpaceWise Living covers.`}
+    topics={category.topics}
+  />
+
+  <ArticleList
+    heading={`Latest ${room} ideas`}
+    articles={listCards}
+    emptyMessage={`${category.name} ideas will appear here as SpaceWise Living publishes new organization guides.`}
+    viewAllHref="/articles/"
+    viewAllLabel="View all articles"
+  />
+
+  <StorageSolutions
+    placeholderNote={`Storage products for ${room} organization will be recommended here once verified product details and links are available. Nothing is listed until then.`}
+  />
+
+  <RelatedRooms categories={related} />
+
+  <EditorialCta />
+</BaseLayout>

@@ -1,0 +1,26 @@
+---
+/**
+ * Divider.
+ *
+ * Whitespace first, borders second. Reach for a divider only where spacing
+ * alone does not make the grouping clear.
+ *
+ * `variant="mark"` is a short accent rule rather than a full-width line - used
+ * above section headings as a small natural cue.
+ */
+interface Props {
+  variant?: 'default' | 'tight' | 'strong' | 'mark';
+  class?: string;
+}
+
+const { variant = 'default', class: className } = Astro.props;
+---
+
+<hr
+  class:list={[
+    'divider',
+    variant !== 'default' && `divider--${variant}`,
+    className,
+  ]}
+  role={variant === 'mark' ? 'presentation' : undefined}
+/>

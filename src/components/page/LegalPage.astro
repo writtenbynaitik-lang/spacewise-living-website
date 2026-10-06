@@ -1,0 +1,99 @@
+---
+/**
+ * LegalPage — the shared shell for /privacy/, /terms/ and /affiliate-disclosure/.
+ *
+ * Legal pages are read, not browsed, so this is the plainest layout on the
+ * site: a heading stack, a reading column and nothing else. No photograph, no
+ * cards, no accent panels, no decorative rules. Body copy uses the existing
+ * `.prose` style, which already caps the measure at `--width-article` and
+ * underlines links.
+ *
+ * It also renders the closing contact block, because all three pages end the
+ * same way and that ending is a FACT ABOUT THE PROJECT (no contact route is
+ * configured) rather than per-page copy. Driving it from `site.contactEmail`
+ * means the three pages cannot drift apart, and cannot go stale once a real
+ * address exists — exactly as /contact/ does.
+ */
+import Container from '../ui/Container.astro';
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Button from '../ui/Button.astro';
+import { site } from '../../config/site';
+import { POLICY_LAST_UPDATED_ISO, POLICY_LAST_UPDATED_LABEL } from '../../config/legal';
+
+interface Props {
+  /** Small label above the title, e.g. "Legal / Privacy". */
+  eyebrow: string;
+  title: string;
+  /** One or two sentences introducing the page. */
+  intro: string;
+  /** Heading for the closing contact block. "Questions" on the disclosure. */
+  contactHeading?: string;
+  /** Sentence before the contact state, specific to each page. */
+  contactIntro?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  intro,
+  contactHeading = 'Contact',
+  contactIntro = 'If you have a question about this page, you can get in touch once a contact route is available.',
+} = Astro.props;
+
+const contactEmail = site.contactEmail;
+---
+
+<Section space="lg" flushBottom>
+  <Container width="content">
+    <header class="legal-head">
+      <Eyebrow class="legal-head__eyebrow" marked>{eyebrow}</Eyebrow>
+      <h1 class="t-h1 legal-head__title">{title}</h1>
+      <p class="t-deck legal-head__intro">{intro}</p>
+      {/*
+        One shared date across all three pages, from config. It records when
+        the wording last changed — it is not an invented "effective date".
+      */}
+      <p class="legal-head__meta">
+        Last updated{' '}
+        <time datetime={POLICY_LAST_UPDATED_ISO}>{POLICY_LAST_UPDATED_LABEL}</time>
+      </p>
+    </header>
+  </Container>
+</Section>
+
+<Section>
+  <Container width="content">
+    <div class="prose legal-body">
+      <slot />
+
+      {/* --- Closing contact block, shared by all three pages ------------- */}
+      <h2>{contactHeading}</h2>
+      <p>{contactIntro}</p>
+      {
+        contactEmail ? (
+          <p>
+            You can write to <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+          </p>
+        ) : (
+          /*
+            No contact route is configured, and none is invented. Same wording
+            and same source of truth as /contact/.
+          */
+          <p>
+            <strong>Direct contact is not configured yet.</strong> The contact
+            route for {site.name} has not been set up on this site, so there is
+            currently no email address, form or other channel to publish here.
+            The <a href="/contact/">contact page</a> will show the route as soon
+            as one exists.
+          </p>
+        )
+      }
+    </div>
+
+    <div class="legal-actions">
+      <Button href="/articles/" variant="secondary">Explore ideas</Button>
+      <Button href="/small-spaces/" variant="text" arrow>Browse by room</Button>
+    </div>
+  </Container>
+</Section>

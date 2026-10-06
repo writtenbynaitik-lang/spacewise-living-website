@@ -1,0 +1,91 @@
+/* =============================================================================
+   SpaceWise Living — PRODUCT RECOMMENDATION ("Smart Storage Find")
+
+   This module exists to look like USEFUL EDITORIAL GUIDANCE, not an ad.
+
+   The design choices that enforce that:
+     - it reads as a sidenote in the article, not a sales unit: warm surface,
+       hairline border, a single thin accent rule, no shadow, no gradient
+     - the PROBLEM SOLVED comes before the product name in the visual hierarchy,
+       because the editorial point is the problem, not the purchase
+     - the image is a modest square thumbnail, not a hero shot
+     - the CTA is a text/secondary button, never a loud primary fill
+     - there is deliberately NO price, rating, star, review-count, badge or
+       "deal" slot anywhere in this CSS. Those are not just unstyled — they have
+       no home here, which is what stops them being fabricated later.
+       The content schema matches: it has no fields for them either.
+   ========================================================================== */
+
+@layer components {
+  .recommendation {
+    display: grid;
+    gap: var(--space-sm);
+    padding: var(--space-card);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    /* Single accent rule along the leading edge — the one branded cue. */
+    border-inline-start: 2px solid var(--color-accent);
+    border-radius: var(--radius-md);
+  }
+
+  @media (min-width: 30rem) {
+    .recommendation {
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+      gap: var(--space-md);
+      align-items: start;
+    }
+  }
+
+  .recommendation__media {
+    /* Square thumbnail: deliberately modest, so it reads as a reference image
+       rather than a product hero. */
+    max-width: 6.5rem;
+  }
+
+  .recommendation__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  /* The eyebrow names the editorial device, e.g. "Smart storage find". */
+  .recommendation__eyebrow {
+    color: var(--color-accent);
+  }
+
+  /* The problem is the headline. The product is support material. */
+  .recommendation__problem {
+    font-family: var(--font-interface);
+    font-size: var(--text-body);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    color: var(--color-ink);
+  }
+
+  .recommendation__name {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-secondary);
+  }
+
+  .recommendation__explanation {
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+  }
+
+  .recommendation__action {
+    margin-block-start: var(--space-2xs);
+  }
+
+  /* Required affiliate disclosure line. Small, but present and readable
+     (--color-text-muted clears 4.5:1 on this surface at 5.33:1). */
+  .recommendation__disclosure {
+    font-family: var(--font-interface);
+    font-size: var(--text-meta);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+  }
+}

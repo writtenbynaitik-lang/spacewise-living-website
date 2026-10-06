@@ -1,0 +1,113 @@
+---
+/**
+ * SpaceWise Living - "Explore by room" showcase (#explore).
+ *
+ * Category discovery: eight cards, one per approved category, each linking to
+ * its real route. Not a portfolio, product catalogue or article feed.
+ *
+ * The cards are driven entirely by `src/config/categories.ts`, so the order,
+ * names, descriptions and destinations all come from the single source of
+ * truth - there is no second copy of the category list to drift out of sync.
+ *
+ * Nothing is invented: no article counts, no "popular" labels, no statistics,
+ * no ratings, no prices. The config has no fields for them.
+ *
+ * The section ships NO JavaScript. It is a CSS grid of ordinary links, so it
+ * works unchanged with scripting unavailable.
+ */
+import { Picture } from 'astro:assets';
+import Container from './ui/Container.astro';
+import Section from './ui/Section.astro';
+import Eyebrow from './ui/Eyebrow.astro';
+import { categories } from '../config/categories';
+
+interface Props {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+}
+
+const { eyebrow, heading, intro } = Astro.props;
+
+/**
+ * Card widths: ~260px in the four-up desktop grid, ~350px two-up at tablet,
+ * and the full column on a phone.
+ */
+const CARD_SIZES = '(min-width: 64rem) 280px, (min-width: 48rem) 45vw, 92vw';
+const CARD_WIDTHS = [280, 400, 560, 800];
+---
+
+<Section id="explore" aria-labelledby="explore-heading">
+  <Container width="content">
+    <header class="explore__header">
+      <Eyebrow class="explore__eyebrow">{eyebrow}</Eyebrow>
+      <h2 class="t-h2 explore__heading" id="explore-heading">{heading}</h2>
+      <p class="explore__intro">{intro}</p>
+    </header>
+
+    <ul class="explore__grid">
+      {
+        categories.map((category) => (
+          <li>
+            <article class="explore-card">
+              <div class="explore-card__media">
+                {
+                  category.image ? (
+                    <div class="frame explore-card__frame">
+                      <Picture
+                        src={category.image.src}
+                        alt={category.image.alt}
+                        widths={CARD_WIDTHS}
+                        sizes={CARD_SIZES}
+                        formats={['avif', 'webp']}
+                        fallbackFormat="jpeg"
+                        loading="lazy"
+                        decoding="async"
+                        onerror="this.closest('.frame')?.setAttribute('data-media-failed','true')"
+                      />
+                    </div>
+                  ) : (
+                    /*
+                      No category photograph has been supplied. Rather than
+                      invent a filename, pull a remote stock image, or repeat
+                      the hero or intro photograph across all eight cards, the
+                      slot renders the frame's warm surface at the right size.
+                      The card still reads and works; swapping in a real image
+                      is a one-line change in categories.ts.
+
+                      aria-hidden: it carries no information, and the card's
+                      title and description already say what the category is.
+                    */
+                    <div class="frame explore-card__frame" aria-hidden="true" />
+                  )
+                }
+              </div>
+
+              <h3 class="explore-card__title">
+                {/* Stretched link - the title text is the link's accessible name. */}
+                <a class="explore-card__link" href={`/${category.slug}/`}>
+                  {category.name}
+                </a>
+              </h3>
+
+              <p class="explore-card__description">{category.cardDescription}</p>
+
+              {/* Decorative: the link is already identified by its title. */}
+              <span class="explore-card__indicator">
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+                  <path
+                    d="M2.5 8h11m0 0L9 3.5M13.5 8 9 12.5"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </Container>
+</Section>

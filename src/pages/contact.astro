@@ -1,0 +1,160 @@
+---
+/**
+ * /contact/ — Contact SpaceWise Living.
+ *
+ * THE CONTACT ROUTE IS NOT CONFIGURED. `site.contactEmail` is `null` and
+ * `site.social` is empty; project-brief.md lists "final contact email" as an
+ * unresolved input. No `.env` supplies one either.
+ *
+ * So this page says so, plainly, and sends the visitor somewhere that does
+ * exist. What it deliberately does NOT do:
+ *   - invent an email address, phone number, address or social profile,
+ *   - render a form: there is no endpoint, and a form that cannot submit (or
+ *     that fakes a "message sent" state) is a lie told to someone asking for
+ *     help,
+ *   - promise a response time or claim that anything is monitored.
+ *
+ * DATA-DRIVEN, NOT HARDCODED: the moment a real address is set in
+ * `src/config/site.ts`, this page shows a genuine mailto and the
+ * "not configured" panel disappears. That is the only change needed — which is
+ * also why the honest state lives in config rather than in prose here.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/page/PageHero.astro';
+import Container from '../components/ui/Container.astro';
+import Section from '../components/ui/Section.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import Button from '../components/ui/Button.astro';
+import { site } from '../config/site';
+
+/** The single switch between the two truthful states. */
+const contactEmail = site.contactEmail;
+
+/**
+ * Reasons a visitor might write. These describe the SITE's subject matter —
+ * none of them implies customer support, order support or product support,
+ * because no product, order or support process exists.
+ */
+const reasons = [
+  {
+    title: 'Questions about the content',
+    description:
+      'Something in a guide that is unclear, or a room problem you expected to find covered.',
+  },
+  {
+    title: 'Suggestions for future topics',
+    description:
+      'A small-space problem worth writing about that the site has not tackled yet.',
+  },
+  {
+    title: 'Feedback about the website',
+    description:
+      'Anything that was hard to read, hard to find, or did not work the way you expected.',
+  },
+  {
+    title: 'Ideas for useful guides',
+    description:
+      'A storage or organization approach that worked in your own space and might help others.',
+  },
+];
+---
+
+<BaseLayout
+  title="Contact"
+  description="Get in touch with SpaceWise Living about the site's organization content, future topics, or feedback."
+  bare
+>
+  <PageHero
+    eyebrow="Get in touch"
+    title="Have a question or idea?"
+    deck="We'd love to hear from you. If you have a question about SpaceWise Living, an idea for a future topic, or feedback about the site, use the available contact route below."
+  />
+
+  {/* --- How to get in touch / contact status ---------------------------- */}
+  <Section tone="alt" aria-labelledby="contact-route-heading">
+    <Container width="content">
+      <header class="section-head">
+        <Eyebrow class="section-head__eyebrow">How to get in touch</Eyebrow>
+        <h2 class="t-h2 section-head__heading" id="contact-route-heading">
+          {contactEmail ? 'Email SpaceWise Living' : 'Direct contact is not configured yet.'}
+        </h2>
+      </header>
+
+      {
+        contactEmail ? (
+          /*
+            Only ever rendered from a real, configured address. There is no
+            fallback address and no guess.
+          */
+          <div class="contact-route">
+            <p class="contact-route__body">
+              Write to{' '}
+              <a href={`mailto:${contactEmail}`}>{contactEmail}</a>. Please
+              include enough detail for the question to make sense on its own.
+            </p>
+          </div>
+        ) : (
+          <div class="placeholder contact-route">
+            <p class="placeholder__label">Contact route not configured</p>
+            <p class="placeholder__note">
+              The contact route for SpaceWise Living has not been configured on
+              this site yet. In the meantime, you can explore the site's
+              organization ideas and room guides.
+            </p>
+            <div class="contact-route__actions">
+              <Button href="/articles/" variant="primary">Explore ideas</Button>
+              <Button href="/small-spaces/" variant="secondary">Browse by room</Button>
+            </div>
+          </div>
+        )
+      }
+    </Container>
+  </Section>
+
+  {/* --- Things you can reach out about ---------------------------------- */}
+  <Section aria-labelledby="contact-reasons-heading">
+    <Container width="content">
+      <header class="section-head">
+        <Eyebrow class="section-head__eyebrow">Reasons to write</Eyebrow>
+        <h2 class="t-h2 section-head__heading" id="contact-reasons-heading">
+          Things you can reach out about
+        </h2>
+        <p class="section-head__intro">
+          SpaceWise Living is a content site, so these are the things worth
+          raising. There is no order, account or product support.
+        </p>
+      </header>
+
+      <ul class="contact-reasons">
+        {
+          reasons.map((reason) => (
+            <li class="contact-reasons__item">
+              <h3 class="contact-reasons__title">{reason.title}</h3>
+              <p class="contact-reasons__description">{reason.description}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </Container>
+  </Section>
+
+  {/* --- Closing CTA ------------------------------------------------------
+       No newsletter, no signup, no email capture — two real routes. */}
+  <Section tone="accent" aria-labelledby="contact-cta-heading">
+    <Container width="content">
+      <div class="editorial-cta">
+        <Eyebrow class="editorial-cta__eyebrow">In the meantime</Eyebrow>
+        <h2 class="t-h2 editorial-cta__heading" id="contact-cta-heading">
+          Ready to make more room?
+        </h2>
+        <p class="editorial-cta__body">
+          Explore practical organization ideas designed for smaller spaces.
+        </p>
+        <div class="editorial-cta__actions">
+          <Button href="/articles/" variant="primary">Explore ideas</Button>
+          <Button href="/small-spaces/" variant="secondary">Browse by room</Button>
+        </div>
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>

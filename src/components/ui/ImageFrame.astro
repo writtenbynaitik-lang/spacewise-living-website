@@ -1,0 +1,58 @@
+---
+/**
+ * ImageFrame - aspect-ratio wrapper for all site imagery.
+ *
+ * The ratio is always set on the container, which reserves the space before the
+ * image loads and is what keeps layout shift at zero. The content type picks
+ * the ratio - images are never all forced into one shape.
+ *
+ * PLACEHOLDER MODE: no photography has been supplied for this project. Rather
+ * than invent an image asset, omit `src` and the frame renders an honest
+ * labelled placeholder. Remove the label once a real image exists.
+ */
+interface Props {
+  /** Resolved image URL. Omit to render the placeholder. */
+  src?: string;
+  /** Required whenever `src` is set. Empty string only for decorative images. */
+  alt?: string;
+  ratio?: 'landscape' | 'editorial' | 'portrait' | 'pin' | 'square' | 'free';
+  /** Subtle zoom on hover of the enclosing link or card. */
+  zoom?: boolean;
+  bordered?: boolean;
+  /** Drop the radius for full-bleed editorial imagery. */
+  bleed?: boolean;
+  /** Text shown in placeholder mode. */
+  label?: string;
+  loading?: 'lazy' | 'eager';
+  class?: string;
+}
+
+const {
+  src,
+  alt = '',
+  ratio = 'landscape',
+  zoom = false,
+  bordered = false,
+  bleed = false,
+  label = 'Image placeholder',
+  loading = 'lazy',
+  class: className,
+} = Astro.props;
+
+const isPlaceholder = !src;
+---
+
+<div
+  class:list={[
+    'frame',
+    `frame--${ratio}`,
+    zoom && 'frame--zoom',
+    bordered && 'frame--bordered',
+    bleed && 'frame--bleed',
+    isPlaceholder && 'frame--placeholder',
+    className,
+  ]}
+  data-label={isPlaceholder ? `${label} · ${ratio}` : undefined}
+>
+  {!isPlaceholder && <img src={src} alt={alt} loading={loading} decoding="async" />}
+</div>

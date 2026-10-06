@@ -1,0 +1,136 @@
+/* =============================================================================
+   SpaceWise Living — CTA BLOCKS
+
+   One visual pattern, three jobs: a generic call to action, a newsletter
+   block, and a "save this idea" prompt. They are variants rather than three
+   separate components because they are the same thing — a quiet editorial
+   panel with an eyebrow, a heading, a line of copy and one action.
+
+   NOTE ON INTEGRATIONS: no newsletter provider, Pinterest integration or
+   digital-product destination has been approved, so nothing here submits
+   anywhere. These are the visual treatments only.
+   ========================================================================== */
+
+@layer components {
+  .cta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-lg) var(--space-card);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  @media (min-width: 48rem) {
+    .cta { padding: var(--space-xl); }
+  }
+
+  .cta__heading {
+    font-family: var(--font-editorial);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-editorial);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-heading);
+    color: var(--color-ink);
+  }
+
+  .cta__body {
+    font-family: var(--font-interface);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-text-secondary);
+    max-width: var(--width-narrow);
+  }
+
+  .cta__action {
+    margin-block-start: var(--space-2xs);
+  }
+
+  /* Sage tint variant — for the newsletter / audience-building moment. */
+  .cta--accent {
+    background-color: var(--color-accent-soft);
+    border-color: var(--color-accent-border);
+  }
+
+  /* Quiet variant — a rule instead of a box, for use inside article flow where
+     a full panel would interrupt reading. */
+  .cta--inline {
+    padding: var(--space-md) 0 0;
+    background-color: transparent;
+    border: none;
+    border-top: 1px solid var(--color-border-strong);
+    border-radius: 0;
+  }
+
+  /* Centred variant for standalone end-of-page blocks. */
+  .cta--center {
+    align-items: center;
+    text-align: center;
+  }
+
+  .cta--center .cta__body { margin-inline: auto; }
+
+  /* ---------------------------------------------------------------------------
+     NEWSLETTER FORM
+     Layout only. No action, no endpoint, no provider.
+     ------------------------------------------------------------------------ */
+  .cta__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-block-start: var(--space-2xs);
+    width: 100%;
+    max-width: var(--width-narrow);
+  }
+
+  .cta__input {
+    flex: 1 1 14rem;
+    min-height: var(--tap-target-min);
+    padding: var(--space-2xs) var(--space-sm);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-interactive);
+    border-radius: var(--radius-button);
+    font-family: var(--font-interface);
+    font-size: var(--text-body-sm);
+    color: var(--color-ink);
+  }
+
+  .cta__input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .cta__input:disabled {
+    background-color: var(--color-surface-alt);
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Helper / status line under the form. */
+  .cta__note {
+    font-family: var(--font-interface);
+    font-size: var(--text-meta);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+  }
+
+  /* ---------------------------------------------------------------------------
+     SAVE / PIN CTA
+     A lightweight secondary button with a generic bookmark glyph. It uses no
+     third-party brand mark, because no social or brand assets are approved.
+     ------------------------------------------------------------------------ */
+  .save-cta__icon {
+    flex: none;
+    width: 1.05em;
+    height: 1.05em;
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+
+  .button:hover .save-cta__icon {
+    transform: translateY(-1px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button:hover .save-cta__icon { transform: none; }
+  }
+}

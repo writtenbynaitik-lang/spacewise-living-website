@@ -1,0 +1,216 @@
+---
+/**
+ * /about/ — About SpaceWise Living.
+ *
+ * WHAT THIS PAGE IS: an explanation of what the site is for and how to use it.
+ *
+ * WHAT IT IS NOT, deliberately: there is no founder, no byline, no personal
+ * story, no team, no history, no location, no credentials, no awards, no press,
+ * no reader or traffic numbers and no testimonials. None of that has been
+ * supplied, and an About page is exactly where invented credibility usually
+ * gets written. The page earns its place by being useful about the CONTENT
+ * instead of making claims about the people behind it.
+ *
+ * Nothing here asserts that the ideas have been professionally tested, that
+ * products have been tried, or that any affiliate relationship exists.
+ *
+ * SECTIONS: hero → what it is → what you'll find → the approach → philosophy
+ *           → explore → CTA → footer
+ *
+ * The approach section renders the same approved principles as the homepage,
+ * through the same component, from `src/config/approach.ts`.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/page/PageHero.astro';
+import ApproachSection from '../components/ApproachSection.astro';
+import Container from '../components/ui/Container.astro';
+import Section from '../components/ui/Section.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import Button from '../components/ui/Button.astro';
+import CategoryCard from '../components/ui/CategoryCard.astro';
+import { approach } from '../config/approach';
+import { categories } from '../config/categories';
+import { introMedia } from '../config/intro-media';
+
+/**
+ * Reuses the approved introduction photograph rather than generating a new
+ * asset. `introMedia` is nullable by design, so the hero simply renders without
+ * an image if it is ever unset — no stand-in is substituted.
+ */
+const heroImage = introMedia ? { src: introMedia.src, alt: introMedia.alt } : undefined;
+
+/**
+ * Short, truthful descriptions of what each room section covers. These describe
+ * the CONTENT AREA, not any article — no article is claimed to exist.
+ */
+const whatYoullFind: Record<string, string> = {
+  kitchen:
+    'Practical ways to organize cabinets, counters, drawers, and overlooked kitchen space.',
+  bedroom:
+    'Storage and organization ideas for making small bedrooms calmer and more functional.',
+  bathroom:
+    'Space-saving ideas for cabinets, counters, drawers, and awkward bathroom corners.',
+  closet:
+    'Simple ways to make better use of limited hanging, shelf, and floor space.',
+  'living-room':
+    'Organization ideas for keeping compact living spaces functional and uncluttered.',
+  entryway:
+    'Storage ideas for the everyday items that tend to collect near the door.',
+  'home-office':
+    'Practical organization for compact desks, supplies, and work areas.',
+  'small-spaces':
+    'Flexible ideas for apartments, studios, tiny homes, and awkward spaces.',
+};
+---
+
+<BaseLayout
+  title="About"
+  description="SpaceWise Living is a practical destination for small-space organization, storage ideas, and realistic inspiration for making compact homes work better."
+  bare
+>
+  <PageHero
+    eyebrow="About SpaceWise Living"
+    title="Make more room for the life you actually live."
+    deck="SpaceWise Living is a practical destination for small-space organization, storage ideas, and realistic inspiration for making compact homes work better."
+    image={heroImage}
+  />
+
+  {/* --- What SpaceWise Living is --------------------------------------- */}
+  <Section aria-labelledby="about-what-heading">
+    <Container width="content">
+      <div class="prose-block">
+        <Eyebrow class="prose-block__eyebrow">What this site is</Eyebrow>
+        <h2 class="t-h2 prose-block__heading" id="about-what-heading">
+          Small spaces can work harder.
+        </h2>
+        <p class="prose-block__body">
+          SpaceWise Living brings together practical organization ideas, storage
+          solutions, and room-by-room inspiration for people who want to make
+          better use of the space they already have.
+        </p>
+        <p class="prose-block__body">
+          The focus is simple: useful ideas that solve recognizable everyday
+          problems without making a home feel over-designed or complicated.
+        </p>
+      </div>
+    </Container>
+  </Section>
+
+  {/* --- What you'll find here -------------------------------------------
+       A described list rather than a second image-card grid: this section
+       explains the sections, and "Start with your space" below navigates to
+       them. Two identical card grids on one page would just be a repeat. */}
+  <Section tone="alt" aria-labelledby="about-find-heading">
+    <Container width="content">
+      <header class="section-head">
+        <Eyebrow class="section-head__eyebrow">What you'll find here</Eyebrow>
+        <h2 class="t-h2 section-head__heading" id="about-find-heading">
+          Room by room, problem by problem.
+        </h2>
+        <p class="section-head__intro">
+          Every idea belongs to a room, so you can start wherever the clutter
+          actually is.
+        </p>
+      </header>
+
+      <ul class="about-index">
+        {
+          categories.map((category) => (
+            <li class="about-index__item">
+              <h3 class="about-index__name">
+                <a class="about-index__link" href={`/${category.slug}/`}>
+                  {category.name}
+                </a>
+              </h3>
+              <p class="about-index__description">
+                {whatYoullFind[category.slug] ?? category.cardDescription}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </Container>
+  </Section>
+
+  {/* --- The SpaceWise approach ------------------------------------------
+       The same component and the same approved principles the homepage uses,
+       not a restatement. */}
+  <ApproachSection
+    eyebrow={approach.eyebrow}
+    heading={approach.heading}
+    body={approach.body}
+    principles={approach.principles}
+  />
+
+  {/* --- Editorial philosophy --------------------------------------------- */}
+  <Section aria-labelledby="about-philosophy-heading">
+    <Container width="content">
+      <div class="prose-block">
+        <Eyebrow class="prose-block__eyebrow">How the content is written</Eyebrow>
+        <h2 class="t-h2 prose-block__heading" id="about-philosophy-heading">
+          Useful first. Beautiful second.
+        </h2>
+        <p class="prose-block__body">
+          Organization should make everyday life easier, not create another
+          system to maintain. SpaceWise Living focuses on ideas that are
+          practical, realistic, and suited to the limitations of small homes.
+        </p>
+        <p class="prose-block__body">
+          Homes differ, so not every idea will suit every space — the aim is to
+          give you enough to judge what will work in yours.
+        </p>
+      </div>
+    </Container>
+  </Section>
+
+  {/* --- Explore the site --------------------------------------------------
+       The lighter CategoryCard language, not the homepage's photographic grid:
+       this is navigation at the end of a reading page, not a showcase. */}
+  <Section tone="alt" aria-labelledby="about-explore-heading">
+    <Container width="content">
+      <header class="section-head">
+        <Eyebrow class="section-head__eyebrow">Explore the site</Eyebrow>
+        <h2 class="t-h2 section-head__heading" id="about-explore-heading">
+          Start with your space.
+        </h2>
+        <p class="section-head__intro">
+          Choose a room or browse the latest ideas to find practical ways to
+          make better use of the space you already have.
+        </p>
+      </header>
+
+      <ul class="about-rooms">
+        {
+          categories.map((category) => (
+            <li>
+              <CategoryCard name={category.name} href={`/${category.slug}/`} />
+            </li>
+          ))
+        }
+        <li>
+          <CategoryCard name="All articles" href="/articles/" />
+        </li>
+      </ul>
+    </Container>
+  </Section>
+
+  {/* --- Closing CTA -------------------------------------------------------
+       Two real routes. No newsletter, no signup, no email capture. */}
+  <Section tone="accent" aria-labelledby="about-cta-heading">
+    <Container width="content">
+      <div class="editorial-cta">
+        <Eyebrow class="editorial-cta__eyebrow">Keep going</Eyebrow>
+        <h2 class="t-h2 editorial-cta__heading" id="about-cta-heading">
+          Ready to make more room?
+        </h2>
+        <p class="editorial-cta__body">
+          Explore practical organization ideas designed for smaller spaces.
+        </p>
+        <div class="editorial-cta__actions">
+          <Button href="/articles/" variant="primary">Explore ideas</Button>
+          <Button href="/small-spaces/" variant="secondary">Browse by room</Button>
+        </div>
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>

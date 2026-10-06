@@ -1,0 +1,114 @@
+---
+/**
+ * CtaBlock - one editorial panel pattern, three jobs.
+ *
+ *   default    a generic call to action (e.g. a future digital product)
+ *   newsletter email capture layout
+ *   save       a "save this idea" prompt
+ *
+ * They are variants rather than three components because they are visually the
+ * same thing: eyebrow, heading, one line of copy, one action.
+ *
+ * NO INTEGRATIONS ARE WIRED UP. No newsletter provider, Pinterest integration
+ * or product destination has been approved, so the newsletter variant renders
+ * its form as disabled with a visible explanation rather than pretending to
+ * accept a signup. Pass `href` once a real destination exists.
+ */
+import Eyebrow from './Eyebrow.astro';
+import Button from './Button.astro';
+
+interface Props {
+  heading: string;
+  body?: string;
+  eyebrow?: string;
+  variant?: 'default' | 'newsletter' | 'save';
+  /** Tinted sage panel. */
+  accent?: boolean;
+  /** Rule instead of a box, for use inside article flow. */
+  inline?: boolean;
+  center?: boolean;
+  /** Action destination. Omit while the destination is unresolved. */
+  href?: string;
+  actionLabel?: string;
+  /** Helper or status line under the action. */
+  note?: string;
+  class?: string;
+}
+
+const {
+  heading,
+  body,
+  eyebrow,
+  variant = 'default',
+  accent = false,
+  inline = false,
+  center = false,
+  href,
+  actionLabel = 'Learn more',
+  note,
+  class: className,
+} = Astro.props;
+
+const inputId = `cta-email-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<aside
+  class:list={[
+    'cta',
+    accent && 'cta--accent',
+    inline && 'cta--inline',
+    center && 'cta--center',
+    className,
+  ]}
+>
+  {eyebrow && <Eyebrow tone={accent ? 'accent' : 'muted'}>{eyebrow}</Eyebrow>}
+
+  <h2 class="cta__heading">{heading}</h2>
+  {body && <p class="cta__body">{body}</p>}
+
+  {
+    variant === 'newsletter' ? (
+      <div class="cta__form">
+        <label class="visually-hidden" for={inputId}>Email address</label>
+        <input
+          class="cta__input"
+          id={inputId}
+          type="email"
+          name="email"
+          autocomplete="email"
+          placeholder="you@example.com"
+          disabled
+          aria-describedby={`${inputId}-note`}
+        />
+        <Button variant="primary" disabled>{actionLabel}</Button>
+      </div>
+    ) : (
+      href && (
+        <p class="cta__action">
+          <Button
+            variant={variant === 'save' ? 'secondary' : 'primary'}
+            href={href}
+            arrow={variant !== 'save'}
+          >
+            {variant === 'save' && (
+              <svg class="save-cta__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+                <path d="M4 2.5h8a.5.5 0 0 1 .5.5v10.2a.3.3 0 0 1-.46.25L8 10.8l-4.04 2.65a.3.3 0 0 1-.46-.25V3a.5.5 0 0 1 .5-.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+              </svg>
+            )}
+            <slot name="action-label">{actionLabel}</slot>
+          </Button>
+        </p>
+      )
+    )
+  }
+
+  {
+    variant === 'newsletter' ? (
+      <p class="cta__note" id={`${inputId}-note`}>
+        {note ?? 'Newsletter provider not configured yet, so this form is disabled.'}
+      </p>
+    ) : (
+      note && <p class="cta__note">{note}</p>
+    )
+  }
+</aside>
