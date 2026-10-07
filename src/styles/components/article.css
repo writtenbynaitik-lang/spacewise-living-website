@@ -241,7 +241,7 @@
       width: var(--width-wide);
       max-width: calc(100vw - (var(--gutter) * 2));
       /* Centre the wider figure on the narrower reading column. */
-      margin-inline: calc((var(--width-article) - min(var(--width-wide), 100vw - (var(--gutter) * 2))) / 2);
+        margin-inline: auto;
     }
   }
 }
